@@ -1,0 +1,17 @@
+services:
+  fraudlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fraudlens
+    ports:
+      - "8000:8000"
+    shm_size: '2gb'
+    volumes:
+      # Persist trained model and logs between runs
+      - ./checkpoints:/app/checkpoints
+      - ./runs:/app/runs
+    environment:
+      - PYTHONUNBUFFERED=1
+      # Set SKIP_TRAINING=1 to skip training if checkpoint already exists
+      # - SKIP_TRAINING=1

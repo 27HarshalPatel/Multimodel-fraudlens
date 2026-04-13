@@ -1,0 +1,62 @@
+# ──────────────────────────────────────────────
+#  FraudLens — Default Configuration
+# ──────────────────────────────────────────────
+
+data:
+  tabular_path: "data/tabular"
+  image_dir: "data/images"
+  text_path: "data/text/descriptions.csv"
+  sample_size: null          # set to int for quick debugging
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  num_workers: 4
+  seed: 42
+
+tabular:
+  input_dim: 128             # after feature engineering
+  hidden_dims: [256, 128]
+  dropout: 0.3
+  embedding_dim: 128
+
+image:
+  model_name: "google/siglip2-base-patch16-224"
+  image_size: 224
+  freeze_layers: 8           # freeze first N transformer layers
+  embedding_dim: 128
+  augmentation:
+    random_crop: true
+    horizontal_flip: true
+    color_jitter: 0.2
+    gaussian_blur: 0.1
+
+text:
+  model_name: "distilbert-base-uncased"
+  max_length: 128
+  freeze_layers: 4
+  embedding_dim: 128
+
+fusion:
+  embedding_dim: 128
+  num_heads: 4
+  dropout: 0.2
+
+training:
+  batch_size: 32
+  max_epochs: 50
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-5
+  warmup_steps: 500
+  focal_loss_gamma: 2.0
+  focal_loss_alpha: 0.75
+  early_stopping_patience: 7
+  mixed_precision: true
+  gradient_clip_norm: 1.0
+  log_dir: "runs"
+  checkpoint_dir: "checkpoints"
+
+serving:
+  model_checkpoint: "checkpoints/best_model.pt"
+  host: "0.0.0.0"
+  port: 8000
+  max_batch_size: 16

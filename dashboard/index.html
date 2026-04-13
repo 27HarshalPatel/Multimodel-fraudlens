@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudLens — Multimodal Fraud Detection</title>
+    <meta name="description" content="AI-powered multimodal fraud detection dashboard combining transaction data, check images, and text descriptions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Background glow -->
+    <div class="bg-glow bg-glow--1"></div>
+    <div class="bg-glow bg-glow--2"></div>
+
+    <header class="header">
+        <div class="header__logo">
+            <svg class="header__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <h1 class="header__title">Fraud<span>Lens</span></h1>
+        </div>
+        <p class="header__subtitle">Multimodal AI Fraud Detection</p>
+    </header>
+
+    <main class="container">
+        <!-- INPUT SECTION -->
+        <section class="card card--input" id="input-section">
+            <h2 class="card__title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                Transaction Details
+            </h2>
+
+            <form id="fraud-form" class="form">
+                <div class="form__grid">
+                    <div class="form__group">
+                        <label for="amount">Transaction Amount ($)</label>
+                        <input type="number" id="amount" name="TransactionAmt" value="150.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="product">Product Code</label>
+                        <select id="product" name="ProductCD">
+                            <option value="W">W — Web</option>
+                            <option value="H">H — Hardware</option>
+                            <option value="C">C — Commerce</option>
+                            <option value="S">S — Service</option>
+                            <option value="R">R — Retail</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="card-type">Card Type</label>
+                        <select id="card-type" name="card4">
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="discover">Discover</option>
+                            <option value="american express">American Express</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="card-category">Card Category</label>
+                        <select id="card-category" name="card6">
+                            <option value="debit">Debit</option>
+                            <option value="credit">Credit</option>
+                            <option value="charge">Charge</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="email">Email Domain</label>
+                        <select id="email" name="P_emaildomain">
+                            <option value="gmail.com">gmail.com</option>
+                            <option value="yahoo.com">yahoo.com</option>
+                            <option value="hotmail.com">hotmail.com</option>
+                            <option value="protonmail.com">protonmail.com</option>
+                            <option value="anonymous.com">anonymous.com</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label for="device-type">Device Type</label>
+                        <select id="device-type" name="DeviceType">
+                            <option value="desktop">Desktop</option>
+                            <option value="mobile">Mobile</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Text Description -->
+                <div class="form__group form__group--full">
+                    <label for="description">Transaction Description</label>
+                    <textarea id="description" name="description" rows="3" placeholder="e.g. Online purchase from electronics store, check deposit for rent payment..."></textarea>
+                </div>
+
+                <!-- Image Upload -->
+                <div class="form__group form__group--full">
+                    <label>Check Image (optional)</label>
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" id="image-input" name="image" accept="image/*" hidden>
+                        <div class="dropzone__content" id="dropzone-content">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="dropzone__icon"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                            <p>Drop check image here or <span class="dropzone__link">browse</span></p>
+                            <p class="dropzone__hint">PNG, JPG, or WEBP</p>
+                        </div>
+                        <img id="image-preview" class="dropzone__preview" alt="Preview" hidden>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn--primary" id="submit-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn__icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Analyze Transaction</span>
+                    <div class="btn__loader" id="btn-loader" hidden>
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+        </section>
+
+        <!-- RESULTS SECTION -->
+        <section class="card card--results" id="results-section" hidden>
+            <h2 class="card__title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                Analysis Results
+            </h2>
+
+            <div class="results">
+                <!-- Fraud Score Gauge -->
+                <div class="gauge-container">
+                    <div class="gauge" id="gauge">
+                        <div class="gauge__ring" id="gauge-ring"></div>
+                        <div class="gauge__inner">
+                            <span class="gauge__score" id="gauge-score">0</span>
+                            <span class="gauge__label">Fraud Score</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge" id="risk-badge">LOW</div>
+                </div>
+
+                <!-- Modality Breakdown -->
+                <div class="modality-section">
+                    <h3 class="section-title">Modality Weights</h3>
+                    <p class="section-desc">How much each data source contributed to the decision</p>
+                    <div class="modality-bars">
+                        <div class="modality-bar">
+                            <div class="modality-bar__header">
+                                <span class="modality-bar__label">📊 Tabular Data</span>
+                                <span class="modality-bar__value" id="attn-tabular">0%</span>
+                            </div>
+                            <div class="modality-bar__track">
+                                <div class="modality-bar__fill modality-bar__fill--tabular" id="attn-tabular-bar"></div>
+                            </div>
+                        </div>
+                        <div class="modality-bar">
+                            <div class="modality-bar__header">
+                                <span class="modality-bar__label">🖼️ Check Image</span>
+                                <span class="modality-bar__value" id="attn-image">0%</span>
+                            </div>
+                            <div class="modality-bar__track">
+                                <div class="modality-bar__fill modality-bar__fill--image" id="attn-image-bar"></div>
+                            </div>
+                        </div>
+                        <div class="modality-bar">
+                            <div class="modality-bar__header">
+                                <span class="modality-bar__label">📝 Description</span>
+                                <span class="modality-bar__value" id="attn-text">0%</span>
+                            </div>
+                            <div class="modality-bar__track">
+                                <div class="modality-bar__fill modality-bar__fill--text" id="attn-text-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Per-Branch Scores -->
+                <div class="branch-section">
+                    <h3 class="section-title">Branch Scores</h3>
+                    <p class="section-desc">Individual fraud signal from each modality</p>
+                    <div class="branch-cards">
+                        <div class="branch-card">
+                            <div class="branch-card__icon">📊</div>
+                            <div class="branch-card__label">Tabular</div>
+                            <div class="branch-card__score" id="branch-tabular">0%</div>
+                        </div>
+                        <div class="branch-card">
+                            <div class="branch-card__icon">🖼️</div>
+                            <div class="branch-card__label">Image</div>
+                            <div class="branch-card__score" id="branch-image">0%</div>
+                        </div>
+                        <div class="branch-card">
+                            <div class="branch-card__icon">📝</div>
+                            <div class="branch-card__label">Text</div>
+                            <div class="branch-card__score" id="branch-text">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Reasons -->
+                <div class="reasons-section">
+                    <h3 class="section-title">Risk Analysis</h3>
+                    <ul class="reasons-list" id="reasons-list"></ul>
+                </div>
+
+                <!-- Deep Analysis Explanation -->
+                <div class="explanations-section" id="explanations-section" hidden>
+                    <h3 class="section-title">Deep Analysis Explanations</h3>
+                    <p class="section-desc">Pixel and token-level integrated gradients</p>
+                    
+                    <div class="explanation-cards">
+                        <!-- Image Heatmap -->
+                        <div class="explanation-card" id="image-explanation-card" hidden>
+                            <h4 class="explanation-card__title">🖼️ Image Anomalies</h4>
+                            <img id="image-heatmap" class="explanation-card__image" alt="Image Heatmap">
+                        </div>
+
+                        <!-- Text Highlighting -->
+                        <div class="explanation-card" id="text-explanation-card" hidden>
+                            <h4 class="explanation-card__title">📝 Suspicious Phrases</h4>
+                            <div id="text-highlights" class="explanation-card__text"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw JSON Toggle -->
+                <details class="raw-json">
+                    <summary class="raw-json__toggle">Show Raw JSON</summary>
+                    <pre class="raw-json__content" id="raw-json"></pre>
+                </details>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>FraudLens — Multimodal Fraud Detection System · SigLIP 2 + DistilBERT + Tabular MLP · Cross-Modal Attention Fusion</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
