@@ -15,7 +15,7 @@
 - [Project Structure](#project-structure)
 - [Installation & Setup](#installation--setup)
 - [How to Run](#how-to-run)
-  - [Run Training](#run-training)
+  - [Run Training](#how-to-run)
   - [Run the Dashboard](#run-the-dashboard)
 - [Dataset Information](#dataset-information)
 - [Docker Quick Start](#docker-quick-start)
@@ -355,5 +355,5 @@ This project is licensed under the **MIT License** — see [pyproject.toml](pypr
 ---
 
 <p align="center">
-  Built with ❤️ by <strong>Harshal Patel</strong>
+  Built by <strong>Harshal Patel</strong>
 </p>
