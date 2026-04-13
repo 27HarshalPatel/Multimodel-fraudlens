@@ -3,7 +3,7 @@
 > A production-grade fraud detection pipeline that fuses **computer vision (SigLIP 2)**, **NLP (DistilBERT)**, and **structured transaction analysis** through learned cross-modal attention to catch fraud that single-modality systems miss.
 
 **Author:** Harshal Patel  
-**Contact:** [GitHub Profile](https://github.com/harshalanilpatel)  
+**Contact:** [GitHub Profile](https://github.com/27HarshalPatel)  
 **Course:** Advanced Deep Learning — Spring 2026
 
 ---
@@ -15,7 +15,6 @@
 - [Project Structure](#project-structure)
 - [Installation & Setup](#installation--setup)
 - [How to Run](#how-to-run)
-  - [Run the Setup Notebook](#run-the-setup-notebook)
   - [Run Training](#run-training)
   - [Run the Dashboard](#run-the-dashboard)
 - [Dataset Information](#dataset-information)
@@ -72,7 +71,6 @@ See `docs/architecture_diagram.png` for the full data-flow diagram.
 ```
 Multimodal-fraudlens/
 ├── app.py                  # FastAPI inference server + dashboard
-├── main.py                 # Training entry point
 ├── Dockerfile              # Multi-stage Docker build
 ├── docker-compose.yml      # Compose for API + training
 ├── pyproject.toml          # Python project metadata & deps
@@ -179,33 +177,55 @@ print('Done!')
 
 ## How to Run
 
-### Run the Setup Notebook
+### Google Colab Pro (H100 GPU) Full Pipeline
 
-The `notebooks/setup.ipynb` notebook verifies the environment, loads data, and produces exploration plots:
+To execute the entire project end-to-end on a Google Colab Pro instance, you can run the following sequence in your terminal. This downloads the real datasets, generates the supplements, and exploits the H100's massive 80GB VRAM by aggressively scaling the batch size to 128.
 
 ```bash
-cd notebooks
-jupyter notebook setup.ipynb
+# 1. Install dependencies
+pip install -r requirements.txt
+pip install -e .
+pip install kaggle
+
+# 2. Authenticate Kaggle (REPLACE THESE with your real details)
+export KAGGLE_USERNAME="your-kaggle-username"
+export KAGGLE_KEY="your-kaggle-key"
+
+# 3. Download and set up real-world tabular data
+python -m src.data.download_data
+mkdir -p data/paysim
+kaggle datasets download ealaxi/paysim1 -p data/paysim --unzip
+
+# 4. Download and set up image & text data using our script fix
+git clone https://github.com/saifkhichi96/ssbi-dataset.git data/ssbi
+mkdir -p data/images/normal
+cp -r data/ssbi/data/sources/checks/data/* data/images/normal/
+python -c "from src.data.generate_synthetic import generate_check_images, generate_text_descriptions; generate_check_images(n_normal=0, n_tampered=500); generate_text_descriptions()"
+
+# 5. Launch H100 Accelerated Training
+python -m src.training.train \
+    --tabular-dir data/tabular \
+    --paysim-path data/paysim/paysim.csv \
+    --image-dir data/images \
+    --text-path data/text/descriptions.csv \
+    --epochs 50 \
+    --batch-size 128 \
+    --device cuda
 ```
 
-Or run it headlessly:
+### Multi-GPU DDP Training
+
+If you are using a multi-GPU environment, swap the last command out to utilize `torchrun` and enable Distributed Data Parallel (DDP):
 
 ```bash
-jupyter nbconvert --to notebook --execute notebooks/setup.ipynb --output setup_executed.ipynb
-```
-
-### Run Training
-
-We support standard training and Multi-GPU Distributed Data Parallel (DDP) training.
-
-**Single GPU (or CPU) Training:**
-```bash
-python -m src.training.train --epochs 50 --batch-size 32
-```
-
-**Multi-GPU DDP Training (e.g., node with 2 GPUs):**
-```bash
-torchrun --nproc_per_node=2 -m src.training.train --ddp --batch-size 32
+torchrun --nproc_per_node=2 -m src.training.train \
+    --tabular-dir data/tabular \
+    --paysim-path data/paysim/paysim.csv \
+    --image-dir data/images \
+    --text-path data/text/descriptions.csv \
+    --ddp \
+    --epochs 50 \
+    --batch-size 128
 ```
 
 | Flag | Description | Default |
@@ -270,7 +290,7 @@ docker run -it --rm \
   -v $(pwd)/checkpoints:/app/checkpoints \
   -v $(pwd)/runs:/app/runs \
   fraudlens:latest \
-  python main.py --epochs 50 --batch-size 32
+  python -m src.training.train --epochs 50 --batch-size 32
 ```
 
 ---
