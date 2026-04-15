@@ -214,11 +214,13 @@ class FraudLensPredictor:
         has_image = image is not None
         has_text = text != "no description provided"
 
-        # Explicitly zero out isolated branch scores if the modality was missing
+        # Scale down (but don't zero) branch scores for absent modalities.
+        # The model still produces signal from default inputs (blank image,
+        # placeholder text) — hard zeroing would discard learned patterns.
         if not has_image:
-            img_score = 0.0
+            img_score = round(img_score * 0.3, 1)  # Reduce weight, don't zero
         if not has_text:
-            txt_score = 0.0
+            txt_score = round(txt_score * 0.3, 1)
 
         # Determine risk level
         if fraud_score >= 80:
