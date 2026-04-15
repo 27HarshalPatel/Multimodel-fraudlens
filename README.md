@@ -84,7 +84,7 @@ Multimodal-fraudlens/
 │   ├── style.css           # Dashboard styles
 │   └── app.js              # Dashboard logic
 ├── notebooks/
-│   └── setup.ipynb         # Environment verification & data exploration
+│   └── setup_executed.ipynb         # Environment verification & data exploration
 ├── src/
 │   ├── config.py           # Config loader
 │   ├── inference.py        # Single-sample predictor
