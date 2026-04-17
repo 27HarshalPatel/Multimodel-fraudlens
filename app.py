@@ -156,6 +156,8 @@ async def predict(
 
         # ── Image risk scoring ───────────────────────────────────────
         img_score = 0.0
+        extracted_text = ""
+        has_ocr_suspicious = False
         if pil_image is not None:
             # Image uploaded — financial document images are unusual in
             # legitimate transactions and often indicate fraud evidence
@@ -183,6 +185,36 @@ async def predict(
             if aspect > 1.5:
                 img_score += 10  # Phone screenshot — common in fraud evidence
 
+            # OCR Step to check for phishing text inside screenshot
+            try:
+                import pytesseract
+                import shutil
+                tess_cmd = shutil.which('tesseract')
+                if not tess_cmd:
+                    import os
+                    if os.path.exists('/opt/homebrew/bin/tesseract'):
+                        tess_cmd = '/opt/homebrew/bin/tesseract'
+                if tess_cmd:
+                    pytesseract.pytesseract.tesseract_cmd = tess_cmd
+                    extracted_text = pytesseract.image_to_string(pil_image)
+                    
+                    extracted_lower = extracted_text.lower()
+                    ocr_phishing_keywords = [
+                        'http', '.info', '.biz', '.top', '.xyz', 'cancel', 'urgent', 
+                        'verify', 'login', 'logon', 'password', 'alert', 'notice', 
+                        'suspicious', 'unpaid', 'toll', 'bill', 'late fee', 'reply y'
+                    ]
+                    hits = [w for w in ocr_phishing_keywords if w in extracted_lower]
+                    
+                    has_suspicious_tld = any(tld in extracted_lower for tld in ['.info', '.biz', '.top', '.xyz', '.cc'])
+                    
+                    if has_suspicious_tld or len(hits) >= 3 or ('http' in extracted_lower and any(w in extracted_lower for w in ['urgent', 'verify', 'update', 'unpaid', 'toll'])):
+                        has_ocr_suspicious = True
+                        img_score += 45
+                        tab_reasons.append(f"Image contains suspicious text/URLs (Phishing indicators: {', '.join(hits[:4])})")
+            except Exception as e:
+                logger.warning("OCR failed: %s", e)
+
             img_score = min(img_score, 100.0)
             tab_reasons.append(f"Image analysis detected visual anomalies ({img_score:.0f}% branch score)")
 
@@ -198,12 +230,20 @@ async def predict(
             "payment": 0.40, "charge": 0.35, "debit": 0.30,
             "withdrawal": 0.50, "zelle": 0.45, "venmo": 0.40,
             "pending": 0.35, "declined": 0.60, "overdraft": 0.55,
+            "logon": 0.85, "login": 0.85, "notice": 0.70, "alert": 0.75,
+            "cancel": 0.80, "http": 0.85, "https": 0.85,
+            "toll": 0.85, "unpaid": 0.85, "bill": 0.50, "late": 0.75,
         }
 
-        if description.strip():
-            words = description.strip().split()
+        # Combine user description with extracted OCR text for thorough analysis
+        combined_text = description.strip()
+        if extracted_text:
+            combined_text += " " + extracted_text
+
+        if combined_text.strip():
+            words = combined_text.strip().split()
             hit_count = 0
-            for w in words[:50]:
+            for w in words[:150]:
                 cleaned = w.strip(".,!?\"'()[]").lower()
                 if cleaned in suspicious_keywords:
                     weight = suspicious_keywords[cleaned]
@@ -240,7 +280,9 @@ async def predict(
         )
 
         # Apply a minimum floor when image shows clear fraud evidence
-        if has_image and img_score >= 60:
+        if has_ocr_suspicious:
+            fused_score = max(fused_score, 95.0)  # Near certain fraud if OCR finds phishing links
+        elif has_image and img_score >= 60:
             fused_score = max(fused_score, img_score * 0.75)
 
         fused_score = min(round(fused_score, 1), 100.0)

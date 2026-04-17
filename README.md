@@ -202,7 +202,11 @@ mkdir -p data/images/normal
 cp -r data/ssbi/data/sources/checks/data/* data/images/normal/
 python -c "from src.data.generate_synthetic import generate_check_images, generate_text_descriptions; generate_check_images(n_normal=0, n_tampered=500); generate_text_descriptions()"
 
-# 5. Launch H100 Accelerated Training
+# 5. [IMPORTANT] Generate SMS Phishing/Toll Scam Multimodal Data
+# This synthesizes SMS screenshot images and texts so the model learns phishing logic.
+python src/data/synthesizer.py
+
+# 6. Launch H100 Accelerated Training
 python -m src.training.train \
     --tabular-dir data/tabular \
     --paysim-path data/paysim/paysim.csv \
