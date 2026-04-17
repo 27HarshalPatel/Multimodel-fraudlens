@@ -1,0 +1,6 @@
+data/
+checkpoints/
+*.pt
+*.csv
+graphify-out/
+.DS_Store
