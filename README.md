@@ -210,12 +210,15 @@ python src/data/synthesizer.py
 python -m src.training.train \
     --tabular-dir data/tabular \
     --paysim-path data/paysim/paysim.csv \
-    --image-dir data/images \
-    --text-path data/text/descriptions.csv \
+    --image-dir . \
+    --text-path data/processed/fraudlens_multimodal.csv \
     --epochs 50 \
     --batch-size 128 \
     --device cuda
 ```
+
+> **Important Note for your specific phishing fix:** 
+> The `--text-path data/processed/fraudlens_multimodal.csv` and `--image-dir .` arguments map to the blended dataset (SMS + Checks) we generated from `synthesizer.py`. If you ever want to revert strictly to training on forged checks without SMS capabilities, you can change `--text-path` back to `data/text/descriptions.csv` and `--image-dir` to `data/images`.
 
 ### Multi-GPU DDP Training
 
