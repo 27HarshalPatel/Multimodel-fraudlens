@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FraudLens — Multimodal Fraud Detection</title>
-    <meta name="description" content="AI-powered multimodal fraud detection dashboard combining transaction data, check images, and text descriptions.">
+    <meta name="description" content="AI-powered multimodal fraud detection dashboard combining transaction data, check images, and text descriptions with OCR analysis.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <!-- Background glow -->
     <div class="bg-glow bg-glow--1"></div>
     <div class="bg-glow bg-glow--2"></div>
+    <div class="bg-glow bg-glow--3"></div>
 
     <header class="header">
         <div class="header__logo">
@@ -22,14 +23,93 @@
             </svg>
             <h1 class="header__title">Fraud<span>Lens</span></h1>
         </div>
-        <p class="header__subtitle">Multimodal AI Fraud Detection</p>
+        <p class="header__subtitle">Multimodal AI Fraud Detection · OCR · Attention Fusion</p>
     </header>
 
     <main class="container">
-        <!-- INPUT SECTION -->
-        <section class="card card--input" id="input-section">
+        <!-- ANALYSIS MODE TABS -->
+        <div class="mode-tabs" id="mode-tabs">
+            <button class="mode-tab mode-tab--active" id="tab-image-scan" data-mode="image-scan" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mode-tab__icon">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21,15 16,10 5,21"/>
+                </svg>
+                <span>Image Scan</span>
+                <span class="mode-tab__badge">OCR</span>
+            </button>
+            <button class="mode-tab" id="tab-full-analysis" data-mode="full-analysis" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mode-tab__icon">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Full Analysis</span>
+                <span class="mode-tab__badge">3-Modal</span>
+            </button>
+            <div class="mode-tab__indicator" id="tab-indicator"></div>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- IMAGE SCAN MODE -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <section class="card card--input" id="image-scan-section">
             <h2 class="card__title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                </svg>
+                Image Fraud Detection
+            </h2>
+            <p class="card__desc">Upload a check, receipt, or screenshot. The model will extract text via OCR and analyze the image for fraud indicators.</p>
+
+            <form id="image-scan-form" class="form">
+                <div class="form__group form__group--full">
+                    <label>Upload Image</label>
+                    <div class="dropzone dropzone--large" id="scan-dropzone">
+                        <input type="file" id="scan-image-input" name="image" accept="image/*" hidden>
+                        <div class="dropzone__content" id="scan-dropzone-content">
+                            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" class="dropzone__icon--large">
+                                <rect x="6" y="6" width="36" height="36" rx="4"/>
+                                <circle cx="17" cy="17" r="3"/>
+                                <polyline points="42,30 33,21 12,42"/>
+                                <path d="M24 2v8M24 38v8M2 24h8M38 24h8" stroke-opacity="0.3"/>
+                            </svg>
+                            <p class="dropzone__title">Drop image here or <span class="dropzone__link">browse files</span></p>
+                            <p class="dropzone__hint">Supports PNG, JPG, WEBP · Check images, receipts, screenshots</p>
+                        </div>
+                        <div class="dropzone__preview-wrapper" id="scan-preview-wrapper" hidden>
+                            <img id="scan-image-preview" class="dropzone__preview" alt="Preview">
+                            <button type="button" class="dropzone__remove" id="scan-remove-btn" title="Remove image">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn--primary" id="scan-submit-btn" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn__icon">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <span>Analyze Image</span>
+                    <div class="btn__loader" id="scan-btn-loader" hidden>
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+            </form>
+        </section>
+
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- FULL ANALYSIS MODE -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <section class="card card--input" id="full-analysis-section" hidden>
+            <h2 class="card__title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                </svg>
                 Transaction Details
             </h2>
 
@@ -97,16 +177,27 @@
                     <div class="dropzone" id="dropzone">
                         <input type="file" id="image-input" name="image" accept="image/*" hidden>
                         <div class="dropzone__content" id="dropzone-content">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="dropzone__icon"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="dropzone__icon">
+                                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
                             <p>Drop check image here or <span class="dropzone__link">browse</span></p>
                             <p class="dropzone__hint">PNG, JPG, or WEBP</p>
                         </div>
-                        <img id="image-preview" class="dropzone__preview" alt="Preview" hidden>
+                        <div class="dropzone__preview-wrapper" id="full-preview-wrapper" hidden>
+                            <img id="image-preview" class="dropzone__preview" alt="Preview">
+                            <button type="button" class="dropzone__remove" id="full-remove-btn" title="Remove image">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn--primary" id="submit-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn__icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn__icon">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
                     <span>Analyze Transaction</span>
                     <div class="btn__loader" id="btn-loader" hidden>
                         <div class="spinner"></div>
@@ -115,10 +206,15 @@
             </form>
         </section>
 
-        <!-- RESULTS SECTION -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- RESULTS SECTION (shared) -->
+        <!-- ════════════════════════════════════════════════════════════ -->
         <section class="card card--results" id="results-section" hidden>
             <h2 class="card__title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22,4 12,14.01 9,11.01"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card__icon">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22,4 12,14.01 9,11.01"/>
+                </svg>
                 Analysis Results
             </h2>
 
@@ -135,14 +231,46 @@
                     <div class="risk-badge" id="risk-badge">LOW</div>
                 </div>
 
+                <!-- OCR Extracted Text Panel -->
+                <div class="ocr-section" id="ocr-section" hidden>
+                    <h3 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14,2 14,8 20,8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <line x1="10" y1="9" x2="8" y2="9"/>
+                        </svg>
+                        OCR Extracted Text
+                    </h3>
+                    <p class="section-desc">Text extracted from the uploaded image via optical character recognition</p>
+                    <div class="ocr-panel" id="ocr-panel">
+                        <pre class="ocr-panel__text" id="ocr-text"></pre>
+                    </div>
+                    <div class="ocr-keywords" id="ocr-keywords-list" hidden>
+                        <span class="ocr-keywords__label">Phishing Indicators:</span>
+                        <div class="ocr-keywords__tags" id="ocr-keywords-tags"></div>
+                    </div>
+                </div>
+
                 <!-- Modality Breakdown -->
                 <div class="modality-section">
-                    <h3 class="section-title">Modality Weights</h3>
+                    <h3 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                        Modality Attention Weights
+                    </h3>
                     <p class="section-desc">How much each data source contributed to the decision</p>
                     <div class="modality-bars">
                         <div class="modality-bar">
                             <div class="modality-bar__header">
-                                <span class="modality-bar__label">📊 Tabular Data</span>
+                                <span class="modality-bar__label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modality-bar__icon"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                                    Tabular Data
+                                </span>
                                 <span class="modality-bar__value" id="attn-tabular">0%</span>
                             </div>
                             <div class="modality-bar__track">
@@ -151,7 +279,10 @@
                         </div>
                         <div class="modality-bar">
                             <div class="modality-bar__header">
-                                <span class="modality-bar__label">🖼️ Check Image</span>
+                                <span class="modality-bar__label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modality-bar__icon"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                                    Image Analysis
+                                </span>
                                 <span class="modality-bar__value" id="attn-image">0%</span>
                             </div>
                             <div class="modality-bar__track">
@@ -160,7 +291,10 @@
                         </div>
                         <div class="modality-bar">
                             <div class="modality-bar__header">
-                                <span class="modality-bar__label">📝 Description</span>
+                                <span class="modality-bar__label">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="modality-bar__icon"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                                    Text / Description
+                                </span>
                                 <span class="modality-bar__value" id="attn-text">0%</span>
                             </div>
                             <div class="modality-bar__track">
@@ -172,21 +306,32 @@
 
                 <!-- Per-Branch Scores -->
                 <div class="branch-section">
-                    <h3 class="section-title">Branch Scores</h3>
+                    <h3 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+                        </svg>
+                        Branch Scores
+                    </h3>
                     <p class="section-desc">Individual fraud signal from each modality</p>
                     <div class="branch-cards">
                         <div class="branch-card">
-                            <div class="branch-card__icon">📊</div>
+                            <div class="branch-card__icon-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                            </div>
                             <div class="branch-card__label">Tabular</div>
                             <div class="branch-card__score" id="branch-tabular">0%</div>
                         </div>
                         <div class="branch-card">
-                            <div class="branch-card__icon">🖼️</div>
+                            <div class="branch-card__icon-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                            </div>
                             <div class="branch-card__label">Image</div>
                             <div class="branch-card__score" id="branch-image">0%</div>
                         </div>
                         <div class="branch-card">
-                            <div class="branch-card__icon">📝</div>
+                            <div class="branch-card__icon-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                            </div>
                             <div class="branch-card__label">Text</div>
                             <div class="branch-card__score" id="branch-text">0%</div>
                         </div>
@@ -195,25 +340,46 @@
 
                 <!-- Risk Reasons -->
                 <div class="reasons-section">
-                    <h3 class="section-title">Risk Analysis</h3>
+                    <h3 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        Risk Analysis
+                    </h3>
                     <ul class="reasons-list" id="reasons-list"></ul>
                 </div>
 
                 <!-- Deep Analysis Explanation -->
                 <div class="explanations-section" id="explanations-section" hidden>
-                    <h3 class="section-title">Deep Analysis Explanations</h3>
+                    <h3 class="section-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="11" y1="8" x2="11" y2="14"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                        Deep Analysis Explanations
+                    </h3>
                     <p class="section-desc">Pixel and token-level integrated gradients</p>
                     
                     <div class="explanation-cards">
                         <!-- Image Heatmap -->
                         <div class="explanation-card" id="image-explanation-card" hidden>
-                            <h4 class="explanation-card__title">🖼️ Image Anomalies</h4>
+                            <h4 class="explanation-card__title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="explanation-card__icon"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                                Image Anomaly Heatmap
+                            </h4>
                             <img id="image-heatmap" class="explanation-card__image" alt="Image Heatmap">
                         </div>
 
                         <!-- Text Highlighting -->
                         <div class="explanation-card" id="text-explanation-card" hidden>
-                            <h4 class="explanation-card__title">📝 Suspicious Phrases</h4>
+                            <h4 class="explanation-card__title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="explanation-card__icon"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Suspicious Text Patterns
+                            </h4>
                             <div id="text-highlights" class="explanation-card__text"></div>
                         </div>
                     </div>
@@ -221,7 +387,10 @@
 
                 <!-- Raw JSON Toggle -->
                 <details class="raw-json">
-                    <summary class="raw-json__toggle">Show Raw JSON</summary>
+                    <summary class="raw-json__toggle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="raw-json__icon"><polyline points="16,18 22,12 16,6"/><polyline points="8,6 2,12 8,18"/></svg>
+                        Show Raw JSON
+                    </summary>
                     <pre class="raw-json__content" id="raw-json"></pre>
                 </details>
             </div>
@@ -229,7 +398,7 @@
     </main>
 
     <footer class="footer">
-        <p>FraudLens — Multimodal Fraud Detection System · SigLIP 2 + DistilBERT + Tabular MLP · Cross-Modal Attention Fusion</p>
+        <p>FraudLens — Multimodal Fraud Detection · SigLIP 2 + DistilBERT + Tabular MLP · Cross-Modal Attention Fusion · OCR Analysis</p>
     </footer>
 
     <script src="/static/app.js"></script>

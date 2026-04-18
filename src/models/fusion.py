@@ -60,6 +60,7 @@ class AttentionFusion(nn.Module):
         tabular_emb: torch.Tensor,
         image_emb: torch.Tensor,
         text_emb: torch.Tensor,
+        modality_mask: torch.Tensor | None = None,
     ) -> dict[str, torch.Tensor]:
         """Forward pass.
 
@@ -67,6 +68,7 @@ class AttentionFusion(nn.Module):
             tabular_emb: (B, D) tabular embedding.
             image_emb: (B, D) image embedding.
             text_emb: (B, D) text embedding.
+            modality_mask: (B, 3) boolean tensor. True means the modality is missing and should be ignored.
 
         Returns:
             dict with:
@@ -84,11 +86,20 @@ class AttentionFusion(nn.Module):
         query = self.query.expand(B, -1, -1)
 
         # Cross-attention: query attends to modality embeddings
-        attn_output, attn_weights = self.attention(
-            query=query,
-            key=modality_stack,
-            value=modality_stack,
-        )
+        if modality_mask is not None:
+            # MultiheadAttention expects key_padding_mask to be (B, S) where True is ignored.
+            attn_output, attn_weights = self.attention(
+                query=query,
+                key=modality_stack,
+                value=modality_stack,
+                key_padding_mask=modality_mask,
+            )
+        else:
+            attn_output, attn_weights = self.attention(
+                query=query,
+                key=modality_stack,
+                value=modality_stack,
+            )
         # attn_output: (B, 1, D), attn_weights: (B, 1, 3)
 
         fused = attn_output.squeeze(1)  # (B, D)

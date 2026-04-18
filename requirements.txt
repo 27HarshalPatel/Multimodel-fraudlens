@@ -23,3 +23,13 @@ ruff>=0.4.0
 # Explainability & Visualization
 captum>=0.7.0
 matplotlib>=3.8.0
+scipy>=1.11.0
+
+# OCR — Image text extraction
+pytesseract>=0.3.10
+easyocr>=1.7
+
+# Serving
+fastapi>=0.110.0
+uvicorn>=0.29.0
+python-multipart>=0.0.7

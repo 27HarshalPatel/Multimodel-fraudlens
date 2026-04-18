@@ -77,6 +77,7 @@ class FraudLensModel(nn.Module):
         image: torch.Tensor,
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
+        modality_mask: torch.Tensor | None = None,
     ) -> dict[str, torch.Tensor]:
         """Full forward pass through all branches and fusion.
 
@@ -85,19 +86,10 @@ class FraudLensModel(nn.Module):
             image: (B, 3, 224, 224) preprocessed images.
             input_ids: (B, seq_len) text token IDs.
             attention_mask: (B, seq_len) text attention mask.
+            modality_mask: (B, 3) boolean tensor of missing modalities.
 
         Returns:
-            dict with:
-              - 'logit': (B, 1) fused logit
-              - 'probability': (B, 1) fused sigmoid probability
-              - 'attention_weights': (B, 3) [tabular, image, text] weights
-              - 'tabular_logit': (B, 1) tabular branch logit
-              - 'image_logit': (B, 1) image branch logit
-              - 'text_logit': (B, 1) text branch logit
-              - 'tabular_embedding': (B, D) tabular embedding
-              - 'image_embedding': (B, D) image embedding
-              - 'text_embedding': (B, D) text embedding
-              - 'fused_embedding': (B, D) fused embedding
+            dict with output logits, probabilities, and embeddings.
         """
         # Branch forward passes
         tab_out = self.tabular_branch(tabular)
@@ -106,9 +98,10 @@ class FraudLensModel(nn.Module):
 
         # Fusion
         fusion_out = self.fusion(
-            tab_out["embedding"],
-            img_out["embedding"],
-            txt_out["embedding"],
+            tabular_emb=tab_out["embedding"],
+            image_emb=img_out["embedding"],
+            text_emb=txt_out["embedding"],
+            modality_mask=modality_mask,
         )
 
         return {

@@ -192,27 +192,54 @@ class FraudLensPredictor:
             text = "no description provided"
         input_ids, attention_mask = self._preprocess_text(text)
 
+        # ── Determine missing modalities (True means SKIP) ──
+        has_image = image is not None
+        has_text = text != "no description provided"
+        
+        mod_mask = torch.zeros((1, 3), dtype=torch.bool, device=self.device)
+        if not has_image:
+            mod_mask[0, 1] = True
+        if not has_text:
+            mod_mask[0, 2] = True
+
         # Forward pass
         outputs = self.model(
             tabular=tab_tensor,
             image=img_tensor,
             input_ids=input_ids,
             attention_mask=attention_mask,
+            modality_mask=mod_mask,
         )
 
         # Extract scalars
-        fraud_prob = float(outputs["probability"].squeeze().cpu())
-        fraud_score = round(fraud_prob * 100, 1)
-
-        attn = outputs["attention_weights"].squeeze().cpu().numpy()
-        attn_pct = (attn / attn.sum() * 100).tolist()
-
+        raw_prob = float(outputs["probability"].squeeze().cpu())
         tab_score = round(float(torch.sigmoid(outputs["tabular_logit"]).squeeze().cpu()) * 100, 1)
         img_score = round(float(torch.sigmoid(outputs["image_logit"]).squeeze().cpu()) * 100, 1)
         txt_score = round(float(torch.sigmoid(outputs["text_logit"]).squeeze().cpu()) * 100, 1)
+        
+        # ── Dynamic Fallback Scoring ──
+        # If the fusion layer hasn't learned to balance modalities, we boost if any active branch is VERY confident.
+        active_scores = [tab_score]
+        if has_image: active_scores.append(img_score)
+        if has_text: active_scores.append(txt_score)
+        
+        max_branch = max(active_scores)
+        fraud_prob_pct = raw_prob * 100.0
+        
+        # Heuristic override: if any branch screams fraud, listen to it.
+        if max_branch > 80.0:
+            fraud_score = max_branch
+        elif max_branch > fraud_prob_pct:
+            fraud_score = round((fraud_prob_pct + max_branch) / 2.0, 1)
+        else:
+            fraud_score = round(fraud_prob_pct, 1)
 
-        has_image = image is not None
-        has_text = text != "no description provided"
+        attn = outputs["attention_weights"].squeeze().cpu().numpy()
+        # If the mask zeroed out certain attns, ensure others take 100% proportionally.
+        if attn.sum() > 0:
+            attn_pct = (attn / attn.sum() * 100).tolist()
+        else:
+            attn_pct = [33.3, 33.3, 33.3]
 
         # Scale down (but don't zero) branch scores for absent modalities.
         # The model still produces signal from default inputs (blank image,
@@ -266,6 +293,146 @@ class FraudLensPredictor:
                 "text": txt_score,
             },
             "risk_reasons": reasons,
+            **explanations,
+        }
+
+    # ── Image-Only Inference ─────────────────────────────────────────
+
+    @torch.no_grad()
+    def predict_image_only(
+        self,
+        image: Image.Image,
+        ocr_text: str = "",
+    ) -> dict:
+        """Run inference using only an image (and optional OCR text).
+
+        Tabular features are zeroed out and masked so the fusion layer
+        ignores the tabular branch entirely.
+
+        Args:
+            image: PIL Image to analyze.
+            ocr_text: Text extracted via OCR from the image (optional).
+
+        Returns:
+            JSON-serialisable dict with fraud score, branch scores,
+            attention weights, OCR text, and risk reasons.
+        """
+        # Zero tabular tensor
+        tab_tensor = torch.zeros(1, 52, device=self.device)
+
+        # Preprocess image
+        img_tensor = self._preprocess_image(image)
+
+        # Preprocess OCR text (or placeholder)
+        text = ocr_text.strip() if ocr_text else "no description provided"
+        has_text = text != "no description provided"
+        input_ids, attention_mask = self._preprocess_text(text)
+
+        # Modality mask: skip tabular, keep image and text
+        mod_mask = torch.zeros((1, 3), dtype=torch.bool, device=self.device)
+        mod_mask[0, 0] = True   # Mask tabular (not provided)
+        if not has_text:
+            mod_mask[0, 2] = True  # Mask text if no OCR text
+
+        # Forward pass
+        outputs = self.model(
+            tabular=tab_tensor,
+            image=img_tensor,
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            modality_mask=mod_mask,
+        )
+
+        # Extract scalars
+        raw_prob = float(outputs["probability"].squeeze().cpu())
+        img_score = round(float(torch.sigmoid(outputs["image_logit"]).squeeze().cpu()) * 100, 1)
+        txt_score = round(float(torch.sigmoid(outputs["text_logit"]).squeeze().cpu()) * 100, 1)
+        tab_score = 0.0  # Not applicable
+
+        # Score calculation
+        active_scores = [img_score]
+        if has_text:
+            active_scores.append(txt_score)
+
+        max_branch = max(active_scores)
+        fraud_prob_pct = raw_prob * 100.0
+
+        if max_branch > 80.0:
+            fraud_score = max_branch
+        elif max_branch > fraud_prob_pct:
+            fraud_score = round((fraud_prob_pct + max_branch) / 2.0, 1)
+        else:
+            fraud_score = round(fraud_prob_pct, 1)
+
+        attn = outputs["attention_weights"].squeeze().cpu().numpy()
+        if attn.sum() > 0:
+            attn_pct = (attn / attn.sum() * 100).tolist()
+        else:
+            attn_pct = [0.0, 60.0, 40.0]
+
+        # Force tabular attention to 0 for display
+        attn_pct[0] = 0.0
+        remaining = attn_pct[1] + attn_pct[2]
+        if remaining > 0:
+            attn_pct[1] = round(attn_pct[1] / remaining * 100, 1)
+            attn_pct[2] = round(attn_pct[2] / remaining * 100, 1)
+
+        if not has_text:
+            txt_score = round(txt_score * 0.3, 1)
+
+        # Risk level
+        if fraud_score >= 80:
+            risk_level = "Critical"
+        elif fraud_score >= 60:
+            risk_level = "High"
+        elif fraud_score >= 35:
+            risk_level = "Medium"
+        else:
+            risk_level = "Low"
+
+        # Risk reasons
+        reasons = []
+        if img_score > 50:
+            reasons.append(f"Image analysis detected visual anomalies ({img_score}% branch score)")
+        if has_text and txt_score > 50:
+            reasons.append(f"OCR text contains suspicious patterns ({txt_score}% branch score)")
+        elif has_text:
+            reasons.append(f"OCR text analyzed ({txt_score}% branch score)")
+
+        dominant = 1 if attn_pct[1] >= attn_pct[2] else 2
+        labels = ["tabular", "image", "text"]
+        reasons.append(
+            f"Attention is highest on {labels[dominant]} modality "
+            f"({attn_pct[dominant]:.1f}%)"
+        )
+
+        if fraud_score < 15:
+            reasons.append("Overall pattern is consistent with legitimate content")
+
+        # Explanations
+        explanations = {}
+        if self.explainer is not None:
+            tokens = self.tokenizer.convert_ids_to_tokens(input_ids[0])
+            explanations = self.explainer.explain(
+                tab_tensor, img_tensor, input_ids, attention_mask,
+                pil_image=image,
+                tokens=tokens if has_text else None,
+            )
+
+        return {
+            "fraud_score": fraud_score,
+            "risk_level": risk_level,
+            "attention_weights": {
+                "tabular": 0.0,
+                "image": round(attn_pct[1], 1),
+                "text": round(attn_pct[2], 1),
+            },
+            "branch_scores": {
+                "tabular": 0.0,
+                "image": img_score,
+                "text": txt_score,
+            },
+            "risk_reasons": reasons or ["No specific risk factors identified"],
             **explanations,
         }
 
