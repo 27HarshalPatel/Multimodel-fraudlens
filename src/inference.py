@@ -130,10 +130,31 @@ class FraudLensPredictor:
             features.append(float(raw.get(f"D{i}", 0) or 0))
 
         # 7) Categorical cols label-encoded (7 dims)
+        #    Use stable encoding maps that approximate training LabelEncoder output.
+        #    hash(val) % 1000 produced extreme values the model never saw.
+        CAT_ENCODING = {
+            "ProductCD": {"W": 0, "H": 1, "C": 2, "S": 3, "R": 4},
+            "card4": {"visa": 0, "mastercard": 1, "discover": 2, "american express": 3},
+            "card6": {"debit": 0, "credit": 1, "charge": 2, "debit or credit": 3},
+            "P_emaildomain": {
+                "gmail.com": 0, "yahoo.com": 1, "hotmail.com": 2, "outlook.com": 3,
+                "aol.com": 4, "icloud.com": 5, "mail.com": 6, "protonmail.com": 7,
+                "comcast.net": 8, "yandex.com": 9, "anonymous.com": 10,
+            },
+            "R_emaildomain": {
+                "gmail.com": 0, "yahoo.com": 1, "hotmail.com": 2, "outlook.com": 3,
+            },
+            "DeviceType": {"desktop": 0, "mobile": 1},
+            "DeviceInfo": {
+                "Windows": 0, "iOS Device": 1, "MacOS": 2, "Linux": 3,
+                "Trident/7.0": 4, "rv:11.0": 5,
+            },
+        }
         for col in self.CATEGORICAL_COLS:
-            # Simple hash-based encoding for single-sample inference
-            val = str(raw.get(col, "missing") or "missing")
-            features.append(float(hash(val) % 1000))
+            val = str(raw.get(col, "missing") or "missing").lower()
+            col_map = CAT_ENCODING.get(col, {})
+            # Use mapped value, or len(map) as a reasonable 'unknown' code
+            features.append(float(col_map.get(val, len(col_map))))
 
         # Pad / truncate to expected dim
         while len(features) < 52:
@@ -216,23 +237,9 @@ class FraudLensPredictor:
         tab_score = round(float(torch.sigmoid(outputs["tabular_logit"]).squeeze().cpu()) * 100, 1)
         img_score = round(float(torch.sigmoid(outputs["image_logit"]).squeeze().cpu()) * 100, 1)
         txt_score = round(float(torch.sigmoid(outputs["text_logit"]).squeeze().cpu()) * 100, 1)
-        
-        # ── Dynamic Fallback Scoring ──
-        # If the fusion layer hasn't learned to balance modalities, we boost if any active branch is VERY confident.
-        active_scores = [tab_score]
-        if has_image: active_scores.append(img_score)
-        if has_text: active_scores.append(txt_score)
-        
-        max_branch = max(active_scores)
-        fraud_prob_pct = raw_prob * 100.0
-        
-        # Heuristic override: if any branch screams fraud, listen to it.
-        if max_branch > 80.0:
-            fraud_score = max_branch
-        elif max_branch > fraud_prob_pct:
-            fraud_score = round((fraud_prob_pct + max_branch) / 2.0, 1)
-        else:
-            fraud_score = round(fraud_prob_pct, 1)
+
+        # Use the model's fused probability directly — this IS the attention output
+        fraud_score = round(raw_prob * 100.0, 1)
 
         attn = outputs["attention_weights"].squeeze().cpu().numpy()
         # If the mask zeroed out certain attns, ensure others take 100% proportionally.
@@ -349,20 +356,8 @@ class FraudLensPredictor:
         txt_score = round(float(torch.sigmoid(outputs["text_logit"]).squeeze().cpu()) * 100, 1)
         tab_score = 0.0  # Not applicable
 
-        # Score calculation
-        active_scores = [img_score]
-        if has_text:
-            active_scores.append(txt_score)
-
-        max_branch = max(active_scores)
-        fraud_prob_pct = raw_prob * 100.0
-
-        if max_branch > 80.0:
-            fraud_score = max_branch
-        elif max_branch > fraud_prob_pct:
-            fraud_score = round((fraud_prob_pct + max_branch) / 2.0, 1)
-        else:
-            fraud_score = round(fraud_prob_pct, 1)
+        # Score calculation — use model's fusion output directly
+        fraud_score = round(raw_prob * 100.0, 1)
 
         attn = outputs["attention_weights"].squeeze().cpu().numpy()
         if attn.sum() > 0:
