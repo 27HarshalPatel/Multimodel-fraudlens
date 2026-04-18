@@ -411,6 +411,37 @@ python -m src.training.train \
     --epochs 50 --batch-size 128 --device cuda
 ```
 
+### Google Colab (T4 GPU — 16GB VRAM)
+
+The T4 has 16GB VRAM (vs. H100's 80GB), so batch size and learning rate must be adjusted:
+
+| Parameter | H100 (80GB) | T4 (16GB) | Reason |
+|-----------|------------|-----------|--------|
+| `--batch-size` | 128 | **16** | T4 has ~5× less VRAM; SigLIP 2 + DistilBERT activations dominate memory |
+| `--epochs` | 50 | **35** | T4 is ~15× slower per step; early stopping will terminate if converged |
+| `--lr` | 1e-4 | **5e-5** | Smaller batches produce noisier gradients; lower LR stabilizes training |
+| `--patience` | 7 | **10** | More patience since smaller batch metrics are noisier epoch-to-epoch |
+| `--num-workers` | 0 | **2** | Colab has CPU cores available; overlap data loading with GPU compute |
+
+```bash
+# Steps 1–4 are the same as the H100 pipeline above
+
+# 5. Train (T4 16GB VRAM → batch_size=16, lower LR)
+python -m src.training.train \
+    --tabular-dir data/tabular \
+    --paysim-path data/paysim/paysim.csv \
+    --image-dir . \
+    --text-path data/processed/fraudlens_multimodal.csv \
+    --epochs 35 \
+    --batch-size 16 \
+    --lr 5e-5 \
+    --patience 10 \
+    --num-workers 2 \
+    --device cuda
+```
+
+> **Troubleshooting:** If you get `CUDA out of memory` at batch-size 16, drop to `--batch-size 8`. If 24 works without OOM, use that — larger batches give more stable gradients. Mixed precision is enabled by default and is critical on T4 (cuts memory ~40%).
+
 ### Training Hyperparameters
 
 | Parameter | Value | Notes |

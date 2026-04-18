@@ -34,11 +34,11 @@ class MetricsAccumulator:
 
         Returns:
             dict with: loss, auroc, auprc, f1, precision, recall,
+                       f1_optimal, precision_optimal, recall_optimal,
                        confusion_matrix, classification_report, optimal_threshold.
         """
         labels = np.array(self.all_labels)
         probs = np.array(self.all_probs)
-        preds = (probs >= threshold).astype(int)
 
         metrics = {
             "loss": float(np.mean(self.all_losses)),
@@ -55,19 +55,31 @@ class MetricsAccumulator:
 
         metrics["auroc"] = float(roc_auc_score(labels, probs))
         metrics["auprc"] = float(average_precision_score(labels, probs))
-        metrics["f1"] = float(f1_score(labels, preds, zero_division=0))
-        metrics["precision"] = float(precision_score(labels, preds, zero_division=0))
-        metrics["recall"] = float(recall_score(labels, preds, zero_division=0))
-        metrics["confusion_matrix"] = confusion_matrix(labels, preds).tolist()
-        metrics["classification_report"] = classification_report(
-            labels, preds, target_names=["normal", "fraud"], zero_division=0
-        )
 
-        # Find optimal threshold (maximises F1)
+        # Find optimal threshold FIRST (maximises F1 on PR curve)
         precisions, recalls, thresholds = precision_recall_curve(labels, probs)
         f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-8)
         optimal_idx = np.argmax(f1_scores)
-        metrics["optimal_threshold"] = float(thresholds[optimal_idx]) if optimal_idx < len(thresholds) else 0.5
+        optimal_threshold = float(thresholds[optimal_idx]) if optimal_idx < len(thresholds) else 0.5
+        metrics["optimal_threshold"] = optimal_threshold
+
+        # Metrics at default threshold (0.5)
+        preds_default = (probs >= threshold).astype(int)
+        metrics["f1"] = float(f1_score(labels, preds_default, zero_division=0))
+        metrics["precision"] = float(precision_score(labels, preds_default, zero_division=0))
+        metrics["recall"] = float(recall_score(labels, preds_default, zero_division=0))
+
+        # Metrics at OPTIMAL threshold — the model's true performance
+        preds_optimal = (probs >= optimal_threshold).astype(int)
+        metrics["f1_optimal"] = float(f1_score(labels, preds_optimal, zero_division=0))
+        metrics["precision_optimal"] = float(precision_score(labels, preds_optimal, zero_division=0))
+        metrics["recall_optimal"] = float(recall_score(labels, preds_optimal, zero_division=0))
+
+        # Confusion matrix and report at optimal threshold
+        metrics["confusion_matrix"] = confusion_matrix(labels, preds_optimal).tolist()
+        metrics["classification_report"] = classification_report(
+            labels, preds_optimal, target_names=["normal", "fraud"], zero_division=0
+        )
 
         return metrics
 

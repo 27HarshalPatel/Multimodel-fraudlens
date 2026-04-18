@@ -244,6 +244,17 @@ def main() -> None:
         for k, v in best.items():
             if isinstance(v, float):
                 logger.info("  %s: %.4f", k, v)
+        logger.info("-" * 60)
+        logger.info("Summary (use optimal threshold for deployment):")
+        logger.info("  AUROC:  %.4f", best.get("auroc", 0))
+        logger.info("  AUPRC:  %.4f", best.get("auprc", 0))
+        logger.info("  F1 @0.5:     %.4f  |  F1 @optimal:     %.4f",
+                     best.get("f1", 0), best.get("f1_optimal", 0))
+        logger.info("  Prec @0.5:   %.4f  |  Prec @optimal:   %.4f",
+                     best.get("precision", 0), best.get("precision_optimal", 0))
+        logger.info("  Recall @0.5: %.4f  |  Recall @optimal: %.4f",
+                     best.get("recall", 0), best.get("recall_optimal", 0))
+        logger.info("  Optimal threshold: %.4f", best.get("optimal_threshold", 0.5))
         logger.info("=" * 60)
 
     if use_ddp:

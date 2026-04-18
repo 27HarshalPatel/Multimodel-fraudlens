@@ -178,15 +178,20 @@ class Trainer:
                 if key in train_metrics:
                     self.writer.add_scalar(f"train/{key}", train_metrics[key], epoch)
 
+            # Log optimal-threshold metrics (the model's true performance)
+            for key in ["f1_optimal", "precision_optimal", "recall_optimal", "optimal_threshold"]:
+                if key in val_metrics:
+                    self.writer.add_scalar(f"val/{key}", val_metrics[key], epoch)
+
             self.writer.add_scalar("lr", self.optimizer.param_groups[0]["lr"], epoch)
 
             logger.info(
                 "Epoch %d/%d (%.1fs) — train_loss=%.4f, val_loss=%.4f, "
-                "val_auroc=%.4f, val_auprc=%.4f, val_f1=%.4f",
+                "val_auroc=%.4f, val_auprc=%.4f, val_f1=%.4f(%.4f@opt)",
                 epoch, max_epochs, elapsed,
                 train_metrics["loss"], val_metrics["loss"],
                 val_metrics.get("auroc", 0), val_metrics.get("auprc", 0),
-                val_metrics.get("f1", 0),
+                val_metrics.get("f1", 0), val_metrics.get("f1_optimal", 0),
             )
 
             # Early stopping on AUPRC (better for imbalanced data)
@@ -203,10 +208,16 @@ class Trainer:
                     "optimizer_state_dict": self.optimizer.state_dict(),
                     "scheduler_state_dict": self.scheduler.state_dict(),
                     "best_auprc": self.best_auprc,
+                    "optimal_threshold": val_metrics.get("optimal_threshold", 0.5),
                     "val_metrics": val_metrics,
                 }
                 torch.save(checkpoint, self.checkpoint_dir / "best_model.pt")
-                logger.info("✓ Saved best model (AUPRC=%.4f)", val_auprc)
+                logger.info(
+                    "✓ Saved best model (AUPRC=%.4f, F1@opt=%.4f, threshold=%.4f)",
+                    val_auprc,
+                    val_metrics.get("f1_optimal", 0),
+                    val_metrics.get("optimal_threshold", 0.5),
+                )
             else:
                 self.epochs_without_improvement += 1
                 if self.epochs_without_improvement >= self.patience:
