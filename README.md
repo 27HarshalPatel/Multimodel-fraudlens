@@ -135,8 +135,6 @@ Multimodal-fraudlens/
 ├── requirements.txt             # Pip requirements
 ├── configs/
 │   └── default.yaml             # Model & training hyperparameters
-├── checkpoints/
-│   └── best_model.pt            # Trained model weights
 ├── dashboard/
 │   ├── index.html               # Tab-based UI (Image Scan / Full Analysis)
 │   ├── style.css                # Premium dark glassmorphism theme
