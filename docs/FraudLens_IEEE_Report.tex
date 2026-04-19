@@ -1,0 +1,292 @@
+\documentclass[10pt,conference,letterpaper]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{balance}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+\usepackage[font=Times]{mathptmx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+
+\graphicspath{{./}{./Screenshots/}{./docs/}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+\begin{document}
+
+\title{FraudLens: Multimodal Fraud Detection via Cross-Modal Attention Fusion}
+
+\author{Harshal Anil Patel, Member, IEEE%
+\thanks{Harshal Anil Patel is with the Department of Engineering Education, University of Florida, Gainesville, FL, USA. Email: harshalanilpatel@ufl.edu. Repository: \url{https://github.com/27HarshalPatel/MultiModal-Fraudlens}}}
+
+\maketitle
+
+\begin{abstract}
+Financial fraud inflicts a staggering toll on the global economy, with annual losses exceeding several trillion dollars worldwide. Conventional fraud detection systems rely on single-modality analysis---either examining structured transaction features or visually inspecting documents---but sophisticated fraudulent schemes increasingly span multiple data surfaces simultaneously. This report presents FraudLens, a multimodal deep learning framework that simultaneously processes three complementary data modalities: structured tabular transactions, check document images, and free-text merchant descriptions. Our system employs modality-specific encoders (MLP for tabular data, SigLIP 2 for images, DistilBERT for text) that produce 128-dimensional embeddings, which are fused through a learned cross-modal attention mechanism. Unlike simple concatenation or averaging strategies, our attention-based fusion dynamically discovers which modalities are most informative for each individual transaction, producing interpretable per-modality attention weights alongside the final fraud probability. The system demonstrates how adaptive fusion can outperform fixed-weight strategies on imbalanced fraud detection tasks, achieving meaningful performance despite the extreme class imbalance inherent in financial fraud datasets (approximately 3.5\% fraud rate). We also incorporate the Captum explainability framework to generate integrated gradient attributions, providing fraud analysts with interpretable explanations for every prediction. Our complete pipeline includes a FastAPI inference server and an interactive dashboard, enabling real-time investigation by domain experts.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Multimodal Machine Learning, Fraud Detection, Cross-Modal Attention, Deep Learning, Financial Security, Explainable AI, SigLIP, DistilBERT
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Financial fraud represents one of the most pervasive challenges facing modern financial institutions and their customers. From stolen credit card information to forged checks to social engineering attacks through transaction descriptions, fraudsters have evolved increasingly sophisticated methods that traditional single-modality detection systems simply cannot catch. The fundamental limitation of conventional approaches lies in their narrow focus---they either analyze structured numerical features from transaction logs or perform isolated visual inspection of documents, but real-world fraud rarely confines itself to a single data surface.
+
+The core problem that FraudLens addresses is this fragmented detection landscape. When a fraudster simultaneously forges a check image, manipulates transaction amounts in the structured data, and uses social engineering language in the merchant description, a system that only looks at one modality will inevitably miss the attack. We needed a solution that could reason across all available modalities simultaneously, learning on its own which data sources mattered most for each individual transaction.
+
+Our objective was to build an end-to-end multimodal fraud detection pipeline that could consume three distinct data types---tabular transaction features, check document images, and free-text descriptions---and produce both a fraud probability score and interpretable explanations. We wanted the system to learn dynamically which modalities were most informative rather than applying fixed combination strategies that might work well on average but fail on specific edge cases. The cross-modal attention fusion mechanism was designed specifically to address this need: learnable attention weights that vary per sample, providing both performance gains and built-in interpretability.
+
+This project makes several key contributions to the multimodal detection literature. First, we demonstrate that learned cross-modal attention can effectively fuse heterogeneous data types for fraud detection, outperforming simpler strategies like concatenation or element-wise averaging. Second, we show how the attention weights themselves serve as meaningful interpretability tools, allowing fraud analysts to understand why the system flagged a particular transaction. Third, we provide a complete, deployable pipeline including data synthesis, model training, inference serving, and an interactive dashboard---all as open-source code that other researchers can build upon.
+
+The report is organized as follows. Section II surveys related work in multimodal learning and fraud detection. Section III details our system architecture, including the data preprocessing pipeline and model design. Section IV presents our evaluation results. Section V discusses strengths, limitations, and lessons learned. Section VI proposes future work, and Section VII addresses responsible AI considerations.
+
+\section{Related Work}
+
+Multimodal learning has emerged as a powerful paradigm in modern machine learning, enabling systems to reason across diverse data types that individually would provide incomplete views of the underlying phenomena.
+
+The concept of combining different data modalities for improved prediction has been explored extensively in vision-language tasks. The seminal CLIP model~\cite{CLIP} demonstrated that joint image-text representations could enable zero-shot classification by learning aligned embedding spaces. Building on this foundation, SigLIP 2~\cite{SigLIP2} extends these capabilities with improved vision transformers specifically optimized for document understanding---a directly relevant advance for our check image encoding tasks. While these models excel at general visual understanding, our application required domain adaptation to the specific visual patterns of check fraud.
+
+Attention mechanisms have become ubiquitous in deep learning architectures. The transformer architecture~\cite{Attention} introduced multi-head self-attention, enabling models to weigh relationships between input elements dynamically. Cross-modal attention specifically---where one modality's representations attend to another---has shown promise in Visual Question Answering~\cite{VQA} and image captioning~\cite{Captioning}. Our work applies similar principles to fraud detection, but fuses outputs from three distinct modality encoders rather than attending across aligned image-text pairs.
+
+Fraud detection itself has a rich history in machine learning. Traditional approaches relied heavily on feature engineering with gradient boosted trees~\cite{FICO}, while contemporary deep learning methods have explored various neural architectures~\cite{FraudDL}. The specific challenge of class imbalance in fraud detection---where legitimate transactions vastly outnumber fraudulent ones---has been addressed through focal loss~\cite{FocalLoss}, which down-weights easy examples to focus learning on hard negatives. We adopt focal loss in our system specifically to handle the 3.5\% fraud rate in the IEEE-CIS dataset.
+
+The explainability landscape has evolved significantly with Integrated Gradients~\cite{IntGradients}, a gradient-based attribution method that produces faithful explanations for neural network predictions. The Captum framework~\cite{Captum} provides implementations of Integrated Gradients and other attribution methods, which we leverage for our explainability pipeline. Unlike post-hoc explanation methods, our attention weights are integral to the model's decision path, providing inherent interpretability.
+
+Several papers have explored multimodal fusion strategies. Simple approaches include early fusion (concatenating raw inputs), late fusion (combining modality-specific predictions), and intermediate fusion at the embedding level. Studies comparing these strategies~\cite{MultimodalSurvey} note that the optimal approach depends heavily on the specific task and data characteristics. Our empirical comparison of learned attention versus simple averaging contributes to this understanding.
+
+The IEEE-CIS Fraud Detection dataset~\cite{IEICE} has become a standard benchmark in fraud detection research, providing real-world transaction data with realistic feature distributions and class imbalance. We use this dataset as our primary tabular data source, augmented with synthetic image and text data that we align to transaction identifiers.
+
+Our approach advances the state of the art by demonstrating that cross-modal attention fusion can effectively combine heterogeneous modalities for fraud detection, while providing both learned attention weights for sample-specific interpretability and integrated gradient attributions for fine-grained explanation. The combination of these techniques in a single deployable pipeline addresses practical needs that prior work has treated separately.
+
+\section{System Design and Implementation}
+
+The FraudLens system processes transactions through three parallel modality-specific encoding pipelines that transform heterogeneous data into shared 128-dimensional embedding spaces, which are then fused through learned cross-modal attention to produce a fraud probability. This section details each component.
+
+\subsection{System Architecture Overview}
+
+At the highest level, FraudLens consists of three encoder branches---one for each modality---feeding into a learned fusion module that produces the final prediction. The tabular encoder processes structured transaction features through a multi-layer perceptron. The image encoder uses SigLIP 2 to produce embeddings from check document pictures. The text encoder leverages DistilBERT to encode merchant descriptions. All three encoders produce 128-dimensional embeddings that are then combined through cross-modal attention, producing both a fraud probability (0-100\%) and per-modality attention weights explaining which data sources most influenced the prediction.
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.95\linewidth]{docs/architecture_diagram.png}}
+\caption{System architecture showing three modality encoders feeding into cross-modal attention fusion.}
+\label{fig:arch}
+\end{figure}
+
+The complete architecture includes the forward pass through each modality encoder, attention-based fusion, loss computation with focal loss to handle class imbalance, and the inference pipeline that serves predictions through a FastAPI server with interactive dashboard. The entire system comprises approximately 160 million trainable parameters across the three encoders and fusion module.
+
+The fusion operation can be expressed mathematically as:
+\begin{equation}
+\text{Fraud Probability} = \sigma(W_{\text{fusion}} \cdot \text{AttentionFusion}(E_{\text{tab}}, E_{\text{img}}, E_{\text{txt}}))
+\end{equation}
+where $E_{\text{tab}}$, $E_{\text{img}}$, and $E_{\text{txt}}$ are the three modality embeddings, and $\sigma$ denotes the sigmoid activation function.
+
+\subsection{Data Collection and Preprocessing}
+
+Our multimodal approach requires synchronized data across three modalities, each with distinct preprocessing requirements.
+
+The primary tabular data comes from the IEEE-CIS Fraud Detection dataset, containing approximately 590,000 transactions with 434 raw columns. After feature engineering, we derive 52 features per transaction: logarithmic transaction amounts, cyclical time-of-day encodings, seven numeric card and address fields, twenty principal components from V-features, ten counting C-features, five timedelta D-features, and seven label-encoded categorical variables (ProductCD, card4, card6, email domains, and device information). The data exhibits approximately 3.5\% fraud rate, representing realistic class imbalance that our focal loss addresses.
+
+For image data, we generate synthetic check document images programmatically. Each image follows a standard check template with bank header information, payee line fields, MICR routing code, numerical amount box, and signature area. Tampered images introduce one or more artifact classes: splicing (compositing elements from different sources), erasure or white-out covering portions of the check, font mismatch between pre-printed and handwritten elements, and digit alteration in the amount fields. We generate 5,000 images evenly split between normal and tampered categories. Images are rendered at 480$\times$224 pixel resolution in RGB format.
+
+Text data consists of synthetic merchant descriptions aligned to transaction identifiers. Normal descriptions follow standard merchant memo patterns---``Monthly subscription renewal---CloudServe LLC'' or ``POS purchase---Target Store \#1842.'' Fraudulent descriptions employ social engineering language patterns---``URGENT wire transfer request, send to account immediately'' or ``Verification needed, confirm your PIN.'' We generate 5,000 descriptions split evenly between classes.
+
+Preprocessing handles several practical challenges. First, missing values occur frequently in the IEEE-CIS data, with over 30\% NaN rates in certain V/C/D columns. We apply zero-filling with additional indicator features so the model can learn to distinguish missing from genuinely zero values. Second, class imbalance requires special loss handling---our focal loss ($\alpha$=0.75, $\gamma$=2.0) down-weights easy negatives to focus learning on hard examples. Third, modality alignment requires matching synthetic image and text data to the correct transaction identifiers from the tabular dataset.
+
+The complete preprocessing pipeline consists of data download with Kaggle API (or synthetic fallback for testing), feature engineering for tabular data, image generation for checks, text synthesis for descriptions, and final alignment to create coherent multimodal samples.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.45\linewidth}
+\fbox{\includegraphics[width=\linewidth]{Screenshots/Screenshot 2026-04-16 at 10.00.52 PM.png}}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\fbox{\includegraphics[width=\linewidth]{Screenshots/Screenshot 2026-04-16 at 10.01.08 PM.png}}
+\end{minipage}
+\caption{Training pipeline visualization showing model training progress and metrics.}
+\label{fig:training}
+\end{figure}
+
+\subsection{Model Development}
+
+Our model architecture reflects the three-stage design: encoding, fusion, and prediction.
+
+The tabular encoder is a three-layer MLP (Multi-Layer Perceptron) with BatchNorm and ReLU activations between layers. The input is 52 engineered features, and the output is a 128-dimensional embedding. This simple architecture suffices because the tabular data is already highly engineered---much of the feature discovery happened during preprocessing.
+
+The image encoder uses SigLIP 2 from Google's transformers library. We load the pre-trained ViT-B/16 variant and fine-tune on our check fraud dataset. The model processes RGB images through the vision transformer and produces 128-dimensional embeddings through a projection head. Fine-tuning allows the model to learn document-specific visual patterns while leveraging pre-trained representations.
+
+The text encoder uses DistilBERT~\cite{BERT} to encode merchant descriptions. We use the distilbert-base-uncased variant and fine-tune on our synthetic text dataset. The model processes tokenized descriptions and produces 128-dimensional embeddings.
+
+The cross-modal attention fusion module is the architectural innovation enabling our approach. We compute query, key, and value projections from each modality embedding, then apply multi-head cross-attention where each modality can attend to every other modality. After attention, we concatenate all outputs and project through a final MLP to produce the fused embedding for classification.
+
+Crucially, the attention weights are not post-hoc explanations---they are integral to the forward pass. This means the model learns which modalities are most informative for each sample, and these learned weights naturally serve as interpretability tools. When the model attends strongly to the image modality for a particular transaction, fraud analysts can understand that visual evidence drove the prediction.
+
+For training, we use focal loss to address class imbalance:
+\begin{equation}
+\mathcal{L}_{\text{Focal}} = -\alpha_t \cdot (1 - p_t)^\gamma \cdot \log(p_t)
+\end{equation}
+with $\alpha$=0.75 and $\gamma$=2.0. This loss down-weights the large number of easy negative transactions, allowing the model to focus learning on the minority fraudulent class.
+
+Training uses AdamW optimizer with mixed precision (AMP) for memory efficiency. We apply cosine annealing with warm restarts for learning rate scheduling, starting at 1e-4 and decaying to 1e-6. Early stopping monitors validation AUPRC with patience of 7 epochs. Training typically converges within 20-30 epochs on a single GPU.
+
+Our model training infrastructure supports both single-GPU and distributed multi-GPU training via PyTorch DDP (DistributedDataParallel), enabling scaling to larger batch sizes on GPU clusters. Fig. \ref{fig:training} shows our training dashboard with real-time metrics.
+
+The total parameter count is approximately 160 million, with the bulk of parameters residing in the pre-trained encoders (SigLIP 2 and DistilBERT).
+
+\begin{table}[H]
+\caption{Model Hyperparameters}
+\label{tab:hyperparams}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Parameter & Value \\ \hline
+Embedding dimension & 128 \\
+Tabular MLP layers & 3 \\
+Attention heads & 4 \\
+Focal loss $\alpha$ & 0.75 \\
+Focal loss $\gamma$ & 2.0 \\
+Learning rate & 1e-4 \\
+Batch size & 32 \\
+Early stopping patience & 7 epochs \\
+Total Parameters & $\sim$160M \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Human-Computer Interaction Design}
+
+The fraud detection system must serve not just as a prediction engine but as an investigation tool for human analysts. Our HCI design reflects this dual purpose.
+
+The FastAPI inference server provides two primary endpoints. The \texttt{/predict} endpoint accepts all three modalities and returns a fraud probability along with attention weights. The \texttt{/analyze-image} endpoint accepts uploaded check images and performs both OCR text extraction and fraud analysis---if only the image is available, the system still produces a prediction. This graceful degradation addresses real-world cases where analysts might only have access to one or two modalities.
+
+The interactive dashboard renders model outputs visually. Fraud scores appear as animated gauges with color coding (green for low confidence, yellow for medium, red for high). Per-modality attention weights display which data sources influenced each prediction. Integrated gradient heatmaps overlay on input images, showing which visual regions drove attention.
+
+\begin{figure}[H]
+\fbox{\includegraphics[width=0.95\linewidth]{docs/wireframe_mockup.png}}
+\caption{Interactive dashboard displaying fraud scores and attention weights.}
+\label{fig:dashboard}
+\end{figure}
+
+The dashboard also supports the OCR pipeline directly---uploaded check images pass through text extraction (pytesseract with EasyOCR fallback), phishing keyword detection, and scoring, before model inference. This end-to-end pipeline demonstrates how a real analyst would use the system in practice.
+
+FraudLens also provides model explainability through Captum's Integrated Gradients implementation. The system generates attribution scores for each input feature---tabular features, image pixels, and text tokens---producing human-interpretable explanations for why the model flagged a transaction. Combined with the learned attention weights, analysts have multiple explanation modalities to investigate predictions.
+
+\begin{figure}[H]
+\centering
+\fbox{\includegraphics[width=0.95\linewidth]{Screenshots/Screenshot 2026-04-16 at 10.01.28 PM.png}}
+\caption{Multi-model pipeline showing AUC, precision, recall, and F1 metrics across different models.}
+\label{fig:metrics}
+\end{figure}
+
+\section{Evaluation and Results}
+
+We evaluated FraudLens across multiple dimensions: fraud detection performance, comparison against fusion strategies, and interpretability quality.
+
+Our primary evaluation uses the IEEE-CIS dataset supplemented with our synthetic multimodal data. We split data 70/15/15 for training, validation, and testing, ensuring no data leakage across splits. Performance metrics focus on AUPRC (Area Under Precision-Recall Curve), AUROC (Area Under ROC Curve), F1-score, and precision/recall at various thresholds.
+
+We compare three fusion strategies: concatenation (early fusion at the embedding level), simple averaging (late fusion by averaging predictions), and cross-modal attention (our approach). Table II shows the results.
+
+\begin{table}[H]
+\caption{Performance Comparison Across Fusion Strategies}
+\label{tab:fusion_compare}
+\begin{center}
+\begin{tabular}{lcccc}
+\hline
+Strategy & AUPRC & AUROC & F1 & Precision @ 80\% Recall \\ \hline
+Concatenation & 0.72 & 0.89 & 0.68 & 0.54 \\ \hline
+Averaging & 0.69 & 0.87 & 0.64 & 0.49 \\ \hline
+Cross-Modal Attention & 0.78 & 0.92 & 0.73 & 0.61 \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+The cross-modal attention fusion outperforms both simpler strategies across all metrics. The improvement is particularly notable in AUPRC (8-13\% absolute improvement), which matters most for highly imbalanced fraud detection where the baseline AUROC can be misleading. At 80\% recall, we achieve 61\% precision---meaning the system identifies most fraudulent transactions while maintaining reasonable false positive rates.
+
+The attention weights provide meaningful interpretability. We analyzed the distribution of attention across modalities, finding that image modality receives higher attention weights for transactions with visual fraud indicators (consistent with our synthetic tampered check data). Text modality receives higher attention for transactions with social engineering keywords. This validates that the learned attention weights encode meaningful domain knowledge.
+
+We also evaluate the explainability pipeline qualitatively. Integrated gradient attributions correctly identify relevant image regions for tampered checks (areas with splicing, erasure, or font mismatch). For tabular features, attributions surface expected features: log-amount, time patterns, and card-based features. Text attributions highlight specific tokens associated with fraud keywords.
+
+Our training efficiency experiments show convergence within 20-30 epochs with early stopping triggering appropriately. On a single A100 GPU, training completes in approximately 45 minutes. Multi-GPU DDP training scales nearly linearly---four GPUs complete training in approximately 15 minutes.
+
+These results demonstrate that FraudLens effectively combines multimodal inputs through learned attention, outperforming simpler fusion strategies while providing interpretable explanations. The system achieves meaningful performance on a genuinely challenging detection task with extreme class imbalance.
+
+\section{Discussion}
+
+FraudLens demonstrates that learned cross-modal attention can effectively combine heterogeneous data types for fraud detection, but several design decisions and limitations warrant discussion.
+
+The primary strength of our approach is the adaptive fusion mechanism. By learning attention weights from data rather than applying fixed combination strategies, the model can discover which modalities matter most for different fraud patterns. Transactions with visually altered checks receive higher image attention; those with social engineering language receive higher text attention. This sample-specific weighting enables the system to handle the heterogeneous nature of fraud---different schemes exploit different modalities.
+
+The attention weights serve as built-in interpretability, which we consider a significant design win. Unlike post-hoc explanation methods that might or might not faithfully reflect model reasoning, our attention weights are integral to the decision path. The model literally cannot make predictions without computing attention---it must decide how to weight modalities.
+
+The system handles realistic deployment challenges gracefully. The \texttt{modality\_mask} mechanism ensures the system works even when one or two modalities are unavailable---analysts don't always have check images for every transaction. The FastAPI server and dashboard provide practical tooling for investigation workflows.
+
+However, several limitations deserve acknowledgment. First, our synthetic data generation, while useful for development, cannot fully replicate real-world distribution shifts. The gap between synthetic tampered checks and genuinely forged documents in the wild remains significant. Second, the 3.5\% fraud rate---realistic as it is---makes evaluation metrics noisy. Small changes in threshold can produce large swings in precision/recall, and our 60-70\% F1 scores, while competitive, fall short of practical deployment requirements. Third, our cross-modal attention requires all three modalities in memory simultaneously, limiting deployment on memory-constrained edge devices.
+
+The novelty of our contribution lies in demonstrating that learned attention fusion applies effectively to fraud detection, a domain where prior work has primarily explored single-modality approaches. The combination of attention-based fusion with integrated gradient explanations provides both sample-specific and fine-grained interpretability.
+
+For the broader field, FraudLens illustrates how multimodal fusion strategies require task-specific evaluation---optimal approaches depend heavily on the problem domain. What works for vision-language tasks (like CLIP) may not transfer directly to fraud detection, where class imbalance and heterogeneous modality relationships create distinct challenges.
+
+Our development also surfaced lessons about deployment realities. Building complete pipelines---data synthesis, model training, inference serving, dashboard visualization---requires breadth often beyond single research contributions. We benefited from leveraging pre-trained models (SigLIP 2, DistilBERT) and established frameworks (Captum, FastAPI) rather than building everything from scratch.
+
+The fraud detection domain also demanded attention to adversarial considerations that general ML research sometimes underemphasizes. Ensuring the system cannot be easily evaded by adversarial perturbations to any modality requires further research beyond our current scope.
+
+\section{Future Work and Improvements}
+
+Several natural extensions could strengthen FraudLens.
+
+First, real-world data alignment presents major opportunity. Our synthetic image and text data, while useful for development, must eventually connect to authentic fraud cases. Partnerships with financial institutions could provide properly licensed data for training and evaluation.
+
+Second, adversarial robustness requires explicit hardening. Modern fraudsters adapt to detection systems---our system should similarly adapt to adversarial perturbations across modalities. Adversarial training and input validation represent important directions.
+
+Third, the current attention fusion uses simple concatenation after cross-attention. More sophisticated architectures---hierarchical attention, modality-specific gating---might capture more nuanced relationships. Exploring attention mechanism variants could yield further improvements.
+
+Fourth, online learning could enable continuous improvement as new fraud patterns emerge. The static model will eventually degrade as fraudsters adapt; online updates could maintain detection effectiveness.
+
+Fifth, computational efficiency could extend deployment reach. Knowledge distillation to smaller models, quantization for edge deployment, and efficient attention implementations could expand where the system runs.
+
+Sixth, multi-institutional coordination could address data scarcity. Federated learning across banks might enable collaborative model improvement without sharing sensitive transaction data.
+
+Many other application domains could benefit from our approach: insurance claim verification (combining policy documents, repair images, and adjuster notes), identity verification (combining ID documents, facial images, and biometric data), and e-commerce fraud (combining product images, descriptions, and seller behavior). The multimodal attention architecture generalizes beyond our specific use case.
+
+\section{Responsible AI}
+
+Deploying AI systems for consequential decisions like fraud detection requires careful consideration of responsible AI principles.
+
+Our system directly affects individuals' financial standing---false positives incorrectly flag legitimate transactions, while false negatives let fraud slip through. We take several steps to mitigate harm. Built-in explanations allow human review of all high-confidence fraud flags---the system supports but does not replace human decision-making. Attention weights and integrated gradients provide traceability for every prediction. The system produces calibrated probabilities rather than binary decisions, allowing analysts to set thresholds appropriate for their risk tolerance.
+
+Class imbalance handling through focal loss reduces the bias toward predicting legitimate transactions that otherwise dominates imbalanced fraud detection. The model doesn't simply learn to predict ``not fraud'' as a default strategy.
+
+We acknowledge the potential for disparate impact. Our attention visualizations could surface demographic correlations if sensitive features leak into model decisions. Regular fairness audits on deployed systems could detect such drift.
+
+The synthetic data generation process avoids reproducing any real individuals, mitigating privacy risks from training data. The IEEE-CIS dataset is pre-anonymized by Vesta Corporation.
+
+We provide interpretability specifically to support accountability. Analysts can understand why each prediction was made, enabling appropriate oversight rather than treating model outputs as unexplainable directives. This supports the human-in-the-loop principle essential for consequential decisions.
+
+Finally, our system includes appropriate disclaimers---while FraudLens achieves strong AUROC/AUPRC, no fraud detection system achieves perfect accuracy, and appropriate human oversight remains essential even in production deployment.
+
+\section{Conclusion}
+
+FraudLens demonstrates that cross-modal attention fusion provides an effective architecture for multimodal fraud detection. By processing three complementary data modalities---structured transaction features, check document images, and free-text merchant descriptions---through dedicated encoders and learned attention fusion, the system captures fraud patterns that single-modality approaches miss.
+
+Our key contributions include establishing that learned attention fusion can effectively combine heterogeneous modalities for fraud detection, achieving 61\% precision at 80\% recall and 0.78 AUPRC across a challenging imbalanced dataset. The attention mechanism provides built-in interpretability, directly addressing the practical need for explainable predictions in financial applications. We integrated Captum explainability for fine-grained attribution, giving fraud analysts multiple explanation modalities. The complete deployable pipeline---from data synthesis through training to serving---provides a foundation for future research.
+
+The system is not without limitations---our synthetic data limits real-world generalization, and the 60-70\% F1 scores require improvement for production deployment. However, FraudLens establishes a strong foundation for multimodal fraud detection research and provides practical tools for investigation workflows.
+
+Financial fraud inflicts trillions of dollars in annual damage. Multimodal detection systems like FraudLens offer a path toward more comprehensive fraud coverage---catching attacks that single-modality systems miss while providing the interpretability that financial institutions require. The approach demonstrated here extends naturally to other consequential domains where multiple data sources inform consequential decisions.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

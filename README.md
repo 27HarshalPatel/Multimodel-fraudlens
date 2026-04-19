@@ -8,6 +8,17 @@
 
 ---
 
+## 📺 Demo
+<div align="center">
+
+  ![FraudLens Demo](demo.gif)
+
+  *Watch FraudLens in action - multimodal fraud detection analyzing tabular features, images, and text in real-time!*
+
+</div>
+
+---
+
 ## Table of Contents
 
 - [Core Contribution](#core-contribution)
