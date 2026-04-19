@@ -135,6 +135,7 @@ Multimodal-fraudlens/
 ├── requirements.txt             # Pip requirements
 ├── FraudLens-Demo-video.mp4     # Demo video in .mp4 format
 ├── demo.gif                     # Demo video in .gif format
+├── entrypoint.sh                # .sh file for training
 ├── configs/
 │   └── default.yaml             # Model & training hyperparameters
 ├── dashboard/
