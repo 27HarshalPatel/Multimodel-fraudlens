@@ -2,44 +2,109 @@
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{SigLIP2}
+\citation{BERT}
+\citation{IEICE}
+\citation{Captum}
+\citation{IntGradients}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
 \citation{CLIP}
 \citation{SigLIP2}
 \citation{Attention}
 \citation{VQA}
 \citation{Captioning}
-\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
 \citation{FICO}
 \citation{FraudDL}
 \citation{FocalLoss}
 \citation{IntGradients}
 \citation{Captum}
+\citation{PyTorch}
 \citation{MultimodalSurvey}
 \citation{IEICE}
-\@writefile{toc}{\contentsline {section}{\numberline {III}System Design and Implementation}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}System Architecture Overview}{2}{subsection.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces System architecture showing three modality encoders feeding into cross-modal attention fusion.}}{2}{figure.caption.1}\protected@file@percent }
+\citation{PaySim}
+\citation{IEICE}
+\citation{PaySim}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Datasets and Data Pipeline}{2}{section.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Data Sources and Component Maturity}}{2}{table.caption.1}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:arch}{{1}{2}{System architecture showing three modality encoders feeding into cross-modal attention fusion}{figure.caption.1}{}}
+\newlabel{tab:datasets}{{I}{2}{Data Sources and Component Maturity}{table.caption.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Tabular Data}{2}{subsection.3.1}\protected@file@percent }
 \citation{BERT}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Data Collection and Preprocessing}{3}{subsection.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Training pipeline visualization showing model training progress and metrics.}}{3}{figure.caption.2}\protected@file@percent }
-\newlabel{fig:training}{{2}{3}{Training pipeline visualization showing model training progress and metrics}{figure.caption.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Model Development}{3}{subsection.3.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Model Hyperparameters}}{4}{table.caption.3}\protected@file@percent }
-\newlabel{tab:hyperparams}{{I}{4}{Model Hyperparameters}{table.caption.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Human-Computer Interaction Design}{4}{subsection.3.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Interactive dashboard displaying fraud scores and attention weights.}}{4}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:dashboard}{{3}{4}{Interactive dashboard displaying fraud scores and attention weights}{figure.caption.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Multi-model pipeline showing AUC, precision, recall, and F1 metrics across different models.}}{5}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:metrics}{{4}{5}{Multi-model pipeline showing AUC, precision, recall, and F1 metrics across different models}{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Evaluation and Results}{5}{section.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Performance Comparison Across Fusion Strategies}}{5}{table.caption.6}\protected@file@percent }
-\newlabel{tab:fusion_compare}{{II}{5}{Performance Comparison Across Fusion Strategies}{table.caption.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Discussion}{5}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Future Work and Improvements}{6}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Responsible AI}{6}{section.7}\protected@file@percent }
+\citation{FocalLoss}
+\citation{SigLIP2}
+\citation{BERT}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Image Data}{3}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Text Data}{3}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Preprocessing Pipeline}{3}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}System Architecture}{3}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Overview}{3}{subsection.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Three modality encoders producing 128-d embeddings, fused via learned cross-modal attention. The modality mask zeros attention weights for absent inputs.}}{3}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:arch}{{1}{3}{Three modality encoders producing 128-d embeddings, fused via learned cross-modal attention. The modality mask zeros attention weights for absent inputs}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Modality-Specific Encoders}{3}{subsection.4.2}\protected@file@percent }
+\citation{Attention}
+\citation{FocalLoss}
+\citation{AdamW}
+\citation{CosineAnnealing}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Cross-Modal Attention Fusion}{4}{subsection.4.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Fusion Strategy Comparison}}{4}{table.caption.3}\protected@file@percent }
+\newlabel{tab:fusion_strategies}{{II}{4}{Fusion Strategy Comparison}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Auxiliary Branch Losses}{4}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}OCR and Document Fraud Detection Pipeline}{4}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Training Infrastructure}{4}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Optimization and Scheduling}{4}{subsection.5.1}\protected@file@percent }
+\citation{Captum}
+\citation{IntGradients}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Multi-GPU Distributed Training}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Hardware Configuration}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Hardware-Adaptive Hyperparameters}}{5}{table.caption.4}\protected@file@percent }
+\newlabel{tab:hardware}{{III}{5}{Hardware-Adaptive Hyperparameters}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Hyperparameter Summary}{5}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Model and Training Hyperparameters}}{5}{table.caption.5}\protected@file@percent }
+\newlabel{tab:hyperparams}{{IV}{5}{Model and Training Hyperparameters}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Explainability Pipeline}{5}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Motivation}{5}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Modality-Level Attention Weights}{5}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Layer Integrated Gradients}{5}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Explanation Evaluation}{6}{subsection.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Evaluation and Results}{6}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Setup}{6}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Fusion Strategy Ablation}{6}{subsection.7.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Fusion Strategy Performance (Test Set)}}{6}{table.caption.6}\protected@file@percent }
+\newlabel{tab:fusion_results}{{V}{6}{Fusion Strategy Performance (Test Set)}{table.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Modality Contribution Analysis}{6}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-D}}OCR Document Fraud Detection}{6}{subsection.7.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Full-modality analysis dashboard showing fraud score gauge, per-modality attention weights, branch scores, and risk reasons.}}{6}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:dashboard}{{2}{6}{Full-modality analysis dashboard showing fraud score gauge, per-modality attention weights, branch scores, and risk reasons}{figure.caption.7}{}}
+\citation{IntGradients}
+\citation{IntGradients}
+\citation{FastAPI}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Risk analysis detail panel annotating specific anomalies detected in the OCR-extracted document text.}}{7}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:risk_analysis}{{3}{7}{Risk analysis detail panel annotating specific anomalies detected in the OCR-extracted document text}{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Fraudulent case analysis output showing high fraud score and attention concentrated on image and text modalities.}}{7}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:fraud_result}{{4}{7}{Fraudulent case analysis output showing high fraud score and attention concentrated on image and text modalities}{figure.caption.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Legitimate check analysis output showing low fraud score with tabular modality dominant.}}{7}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:normal_result}{{5}{7}{Legitimate check analysis output showing low fraud score with tabular modality dominant}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-E}}Explainability Quality}{7}{subsection.7.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Captum Integrated Gradients~\cite  {IntGradients} heatmap concentrating on forged routing boundaries and altered dollar amounts in a tampered check.}}{7}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:image_heatmap}{{6}{7}{Captum Integrated Gradients~\cite {IntGradients} heatmap concentrating on forged routing boundaries and altered dollar amounts in a tampered check}{figure.caption.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Image-only analysis mode demonstrating graceful degradation when tabular transaction data is unavailable.}}{7}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:image_only}{{7}{7}{Image-only analysis mode demonstrating graceful degradation when tabular transaction data is unavailable}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Deployment Architecture}{8}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-A}}FastAPI Inference Server}{8}{subsection.8.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces API Endpoint Specification}}{8}{table.caption.12}\protected@file@percent }
+\newlabel{tab:api}{{VI}{8}{API Endpoint Specification}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-B}}Dashboard}{8}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-C}}Docker Deployment}{8}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Discussion and Component Maturity}{8}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-A}}Validated Contributions}{8}{subsection.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-B}}Proof-of-Concept Components}{8}{subsection.9.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Component Maturity Assessment}}{8}{table.caption.13}\protected@file@percent }
+\newlabel{tab:maturity}{{VII}{8}{Component Maturity Assessment}{table.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IX-C}}Known Limitations}{9}{subsection.9.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {X}Future Work}{9}{section.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {XI}Responsible AI}{9}{section.11}\protected@file@percent }
 \bibstyle{IEEEtran}
-\bibdata{references}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Conclusion}{7}{section.8}\protected@file@percent }
-\gdef \@abspage@last{7}
+\bibdata{references_expanded}
+\@writefile{toc}{\contentsline {section}{\numberline {XII}Conclusion}{10}{section.12}\protected@file@percent }
+\gdef \@abspage@last{10}

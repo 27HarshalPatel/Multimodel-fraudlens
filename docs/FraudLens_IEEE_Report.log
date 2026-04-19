@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  19 APR 2026 01:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  19 APR 2026 18:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -406,18 +406,8 @@ LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
 (Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 35.
 LaTeX Info: Redefining \hbar on input line 50.
-
-
-! LaTeX Error: Unknown option `font=Times' for package `mathptmx'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.104 \ProcessOptions\relax
-                           
-? 
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/float/float.sty
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count301
 \float@exts=\toks24
@@ -495,48 +485,125 @@ File: lstmisc.sty 2024/09/23 1.10c (Carsten Heinz)
 File: listings.cfg 2024/09/23 1.10c listings configuration
 ))
 Package: listings 2024/09/23 1.10c (Carsten Heinz)
-Package hyperref Info: Option `colorlinks' set `true' on input line 23.
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count314
-\l__pdf_internal_box=\box60
+(/usr/local/texlive/2025/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen193
+\lightrulewidth=\dimen194
+\cmidrulewidth=\dimen195
+\belowrulesep=\dimen196
+\belowbottomsep=\dimen197
+\aboverulesep=\dimen198
+\abovetopsep=\dimen199
+\cmidrulesep=\dimen256
+\cmidrulekern=\dimen257
+\defaultaddspace=\dimen258
+\@cmidla=\count314
+\@cmidlb=\count315
+\@aboverulesep=\dimen259
+\@belowrulesep=\dimen260
+\@thisruleclass=\count316
+\@lastruleclass=\count317
+\@thisrulewidth=\dimen261
 )
-No file FraudLens_IEEE_Report.aux.
+(/usr/local/texlive/2025/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2024/11/12 v2.9 Span multiple rows of a table
+\multirow@colwidth=\skip56
+\multirow@cntb=\count318
+\multirow@dima=\skip57
+\bigstrutjot=\dimen262
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tools/array.sty
+Package: array 2024/10/17 v2.6g Tabular extension package (FMi)
+\col@sep=\dimen263
+\ar@mcellbox=\box60
+\extrarowheight=\dimen264
+\NC@list=\toks27
+\extratabsurround=\skip58
+\backup@length=\skip59
+\ar@cellbox=\box61
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2023/12/11 v2.12a `tabularx' package (DPC)
+\TX@col@width=\dimen265
+\TX@old@table=\dimen266
+\TX@old@col=\dimen267
+\TX@target=\dimen268
+\TX@delta=\dimen269
+\TX@cols=\count319
+\TX@ftn=\toks28
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/algorithms/algorithm.sty
+Package: algorithm 2009/08/24 v0.1 Document Style `algorithm' - floating enviro
+nment
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
+)
+\@float@every@algorithm=\toks29
+\c@algorithm=\count320
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
+Package: algpseudocode 
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count321
+\c@ALG@rem=\count322
+\c@ALG@nested=\count323
+\ALG@tlm=\skip60
+\ALG@thistlm=\skip61
+\c@ALG@Lnr=\count324
+\c@ALG@blocknr=\count325
+\c@ALG@storecount=\count326
+\c@ALG@tmpcounter=\count327
+\ALG@tmplength=\skip62
+)
+Document Style - pseudocode environments for use with the `algorithmicx' style
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 29.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count328
+\l__pdf_internal_box=\box62
+) (./FraudLens_IEEE_Report.aux)
 \openout1 = `FraudLens_IEEE_Report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 25.
-LaTeX Font Info:    ... okay on input line 25.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+
 -- Lines per column: 56 (exact).
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count315
-\scratchdimen=\dimen193
-\scratchbox=\box61
-\nofMPsegments=\count316
-\nofMParguments=\count317
-\everyMPshowfont=\toks27
-\MPscratchCnt=\count318
-\MPscratchDim=\dimen194
-\MPnumerator=\count319
-\makeMPintoPDFobject=\count320
-\everyMPtoPDFconversion=\toks28
+\scratchcounter=\count329
+\scratchdimen=\dimen270
+\scratchbox=\box63
+\nofMPsegments=\count330
+\nofMParguments=\count331
+\everyMPshowfont=\toks30
+\MPscratchCnt=\count332
+\MPscratchDim=\dimen271
+\MPnumerator=\count333
+\makeMPintoPDFobject=\count334
+\everyMPtoPDFconversion=\toks31
 ) (/usr/local/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -555,32 +622,33 @@ File: color.cfg 2016/01/02 v1.6 sample color configuration
 Package color Info: Driver file: pdftex.def on input line 149.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/mathcolor.ltx))
-Package hyperref Info: Link coloring ON on input line 25.
+Package hyperref Info: Link coloring ON on input line 34.
+
+(./FraudLens_IEEE_Report.out) (./FraudLens_IEEE_Report.out)
 \@outlinefile=\write3
 \openout3 = `FraudLens_IEEE_Report.out'.
 
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\c@lstlisting=\count321
-
-** WARNING: \thanks is locked out when in conference mode (line 33).
+\c@lstlisting=\count335
 
 
-
-LaTeX Warning: Citation `CLIP' on page 1 undefined on input line 58.
-
-
-LaTeX Warning: Citation `SigLIP2' on page 1 undefined on input line 58.
+LaTeX Warning: Citation `SigLIP2' on page 1 undefined on input line 56.
 
 
-LaTeX Warning: Citation `Attention' on page 1 undefined on input line 60.
+LaTeX Warning: Citation `BERT' on page 1 undefined on input line 57.
 
 
-LaTeX Warning: Citation `VQA' on page 1 undefined on input line 60.
+LaTeX Warning: Citation `IEICE' on page 1 undefined on input line 62.
 
 
-LaTeX Warning: Citation `Captioning' on page 1 undefined on input line 60.
+LaTeX Warning: Citation `Captum' on page 1 undefined on input line 64.
+
+
+LaTeX Warning: Citation `IntGradients' on page 1 undefined on input line 65.
+
+
 
 
 
@@ -590,209 +658,384 @@ ocal/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 ]
 
-LaTeX Warning: Citation `FICO' on page 2 undefined on input line 62.
+LaTeX Warning: Citation `CLIP' on page 2 undefined on input line 140.
 
 
-LaTeX Warning: Citation `FraudDL' on page 2 undefined on input line 62.
+LaTeX Warning: Citation `SigLIP2' on page 2 undefined on input line 142.
 
 
-LaTeX Warning: Citation `FocalLoss' on page 2 undefined on input line 62.
+LaTeX Warning: Citation `Attention' on page 2 undefined on input line 148.
 
 
-LaTeX Warning: Citation `IntGradients' on page 2 undefined on input line 64.
+LaTeX Warning: Citation `VQA' on page 2 undefined on input line 152.
 
 
-LaTeX Warning: Citation `Captum' on page 2 undefined on input line 64.
+LaTeX Warning: Citation `Captioning' on page 2 undefined on input line 153.
 
 
-LaTeX Warning: Citation `MultimodalSurvey' on page 2 undefined on input line 66
-.
+LaTeX Warning: Citation `FICO' on page 2 undefined on input line 159.
 
 
-LaTeX Warning: Citation `IEICE' on page 2 undefined on input line 68.
+LaTeX Warning: Citation `FraudDL' on page 2 undefined on input line 161.
+
+
+LaTeX Warning: Citation `FocalLoss' on page 2 undefined on input line 164.
+
+
+LaTeX Warning: Citation `IntGradients' on page 2 undefined on input line 167.
+
+
+LaTeX Warning: Citation `Captum' on page 2 undefined on input line 171.
+
+
+LaTeX Warning: Citation `PyTorch' on page 2 undefined on input line 172.
+
+
+LaTeX Warning: Citation `MultimodalSurvey' on page 2 undefined on input line 17
+5.
 
 
 
-
-LaTeX Warning: File `docs/architecture_diagram.png' not found on input line 82.
-
-
-
-! Package pdftex.def Error: File `docs/architecture_diagram.png' not found: usi
-ng draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.82 ...linewidth]{docs/architecture_diagram.png}}
-                                                  
-? 
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 82
-.
-(/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-)
 LaTeX Font Info:    Trying to load font information for OT1+ztmcm on input line
- 90.
-
+ 212.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/ot1ztmcm.fd
 File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OML+ztmcm on input line
- 90.
+ 212.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omlztmcm.fd
 File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OMS+ztmcm on input line
- 90.
+ 212.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omsztmcm.fd
 File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
 )
 LaTeX Font Info:    Trying to load font information for OMX+ztmcm on input line
- 90.
+ 212.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/omxztmcm.fd
 File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
 )
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 90.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 90.
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 212.
 
-Overfull \hbox (4.75026pt too wide) detected at line 92
-[][][][] \OT1/ztmcm/m/n/10 = \OML/ztmcm/m/it/10 ^^[\OT1/ztmcm/m/n/10 (\OML/ztmc
-m/m/it/10 W[] \OMS/ztmcm/m/n/10 ^^A []\OT1/ztmcm/m/n/10 (\OML/ztmcm/m/it/10 E[]
-; E[]; E[]\OT1/ztmcm/m/n/10 ))
+
+LaTeX Warning: Citation `IEICE' on page 2 undefined on input line 212.
+
+
+LaTeX Warning: Citation `PaySim' on page 2 undefined on input line 212.
+
+
+LaTeX Warning: Citation `IEICE' on page 2 undefined on input line 218.
+
+
+LaTeX Warning: Citation `PaySim' on page 2 undefined on input line 227.
+
+
+Underfull \hbox (badness 1436) in paragraph at lines 234--239
+[]\T1/ptm/m/n/10 Missing val-ues are com-mon in the IEEE-CIS V/C/D
  []
 
 
 
 [2]
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 250.
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 25
+7.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+)
 
-LaTeX Warning: File `Screenshots/Screenshot 2026-04-16 at 10.00.52 PM.png' not 
-found on input line 112.
-
-
-! Package pdftex.def Error: File `Screenshots/Screenshot 2026-04-16 at 10.00.52
- PM.png' not found: using draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.112 ...creenshot 2026-04-16 at 10.00.52 PM.png}}
-                                                  
-? 
-
-Overfull \hbox (6.79999pt too wide) in paragraph at lines 112--113
-[][] 
- []
+LaTeX Warning: Citation `BERT' on page 3 undefined on input line 269.
 
 
-LaTeX Warning: File `Screenshots/Screenshot 2026-04-16 at 10.01.08 PM.png' not 
-found on input line 115.
+LaTeX Warning: Citation `FocalLoss' on page 3 undefined on input line 281.
 
 
-! Package pdftex.def Error: File `Screenshots/Screenshot 2026-04-16 at 10.01.08
- PM.png' not found: using draft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.115 ...creenshot 2026-04-16 at 10.01.08 PM.png}}
-                                                  
-? 
-
-Overfull \hbox (6.79999pt too wide) in paragraph at lines 115--116
-[][] 
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-
-
-LaTeX Warning: Citation `BERT' on page 3 undefined on input line 129.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 133--134
-[]\T1/ptm/m/n/10 Crucially, the at-ten-tion weights are not post-hoc
+Underfull \hbox (badness 10000) in paragraph at lines 276--284
+[]\T1/ptm/m/n/10 The uni-fied mul-ti-modal dataset loader
  []
 
 
 
-[3]
 
-LaTeX Warning: Reference `fig:training' on page 4 undefined on input line 143.
+Overfull \hbox (27.6934pt too wide) detected at line 297
+[][][]\OML/ztmcm/m/it/10 P\OT1/ztmcm/m/n/10 ([]) = \OML/ztmcm/m/it/10 ^^[  []
+ []
 
+<architecture_diagram.png, id=71, 246.6816pt x 246.6816pt>
+File: architecture_diagram.png Graphic file (type png)
+<use architecture_diagram.png>
+Package pdftex.def Info: architecture_diagram.png  used on input line 304.
+(pdftex.def)             Requested size: 239.39923pt x 239.40506pt.
 
-LaTeX Warning: File `docs/wireframe_mockup.png' not found on input line 177.
-
-
-! Package pdftex.def Error: File `docs/wireframe_mockup.png' not found: using d
-raft setting.
-
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.177 ...95\linewidth]{docs/wireframe_mockup.png}}
-                                                  
-? 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Warning: Citation `SigLIP2' on page 3 undefined on input line 317.
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 317--324
+[]\T1/ptm/b/n/10 Image en-coder. \T1/ptm/m/n/10 We fine-tune SigLIP 2 [\T1/ptm/
+b/n/10 ?\T1/ptm/m/n/10 ]
+ []
 
 
-LaTeX Warning: File `Screenshots/Screenshot 2026-04-16 at 10.01.28 PM.png' not 
-found on input line 188.
+Underfull \hbox (badness 10000) in paragraph at lines 317--324
+\T1/ptm/m/n/10 (\T1/pcr/m/n/10 google/siglip2-base-patch16-224\T1/ptm/m/n/10 , 
+ViT-B/16
+ []
 
 
-! Package pdftex.def Error: File `Screenshots/Screenshot 2026-04-16 at 10.01.28
- PM.png' not found: using draft setting.
+Underfull \hbox (badness 1715) in paragraph at lines 317--324
+\T1/ptm/m/n/10 to the document-specific vi-sual pat-terns that dis-tin-guish
+ []
 
-See the pdftex.def package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.188 ...creenshot 2026-04-16 at 10.01.28 PM.png}}
-                                                  
-? 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+LaTeX Warning: Citation `BERT' on page 3 undefined on input line 325.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--331
+[]\T1/ptm/b/n/10 Text en-coder. \T1/ptm/m/n/10 Dis-til-BERT [\T1/ptm/b/n/10 ?\T
+1/ptm/m/n/10 ]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 325--331
+\T1/ptm/m/n/10 (\T1/pcr/m/n/10 distilbert-base-uncased\T1/ptm/m/n/10 ) pro-cess
+es to-k-enized
+ []
+
+
+
+[3 <./architecture_diagram.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 334--338
+[]\T1/ptm/m/n/10 The fu-sion mod-ule (\T1/pcr/m/n/10 src/models/fusion.py\T1/pt
+m/m/n/10 )
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 334--338
+\T1/ptm/m/n/10 is the cen-tral ar-chi-tec-tural con-tri-bu-tion. Let
+ []
+
+
+LaTeX Warning: Citation `Attention' on page 4 undefined on input line 346.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 374--374
+[]|\T1/ptm/m/n/8 Loses non-dominant
+ []
+
+
+LaTeX Warning: Citation `FocalLoss' on page 4 undefined on input line 387.
+
+
+
+
+Underfull \hbox (badness 2478) in paragraph at lines 412--415
+[]\T1/ptm/b/n/10 Dead-giveaway phrases\T1/ptm/m/n/10 : ex-act sub-string match-
+ing
+ []
+
+
+Underfull \hbox (badness 1436) in paragraph at lines 415--418
+[]\T1/ptm/b/n/10 Placeholder amount de-tec-tion\T1/ptm/m/n/10 : regex pat-terns
+ for
+ []
+
+
+Underfull \hbox (badness 2027) in paragraph at lines 418--422
+[]\T1/ptm/b/n/10 Balance cal-cu-la-tion ver-i-fi-ca-tion\T1/ptm/m/n/10 : parsed
+ mon-e-tary
+ []
+
+
+LaTeX Warning: Citation `AdamW' on page 4 undefined on input line 442.
+
+
+LaTeX Warning: Citation `CosineAnnealing' on page 4 undefined on input line 443
+.
 
 
 
 [4]
-Overfull \hbox (30.91835pt too wide) in paragraph at lines 205--212
- [] 
+Underfull \hbox (badness 5847) in paragraph at lines 488--488
+[]|\T1/ptm/m/n/8 Overlap data load-ing with
+ []
+
+
+Underfull \hbox (badness 1603) in paragraph at lines 527--532
+[]\T1/ptm/m/n/10 Fraud de-tec-tion mod-els that op-er-ate on con-se-quen-tial
+ []
+
+
+Underfull \hbox (badness 1412) in paragraph at lines 527--532
+\T1/ptm/m/n/10 decisions---blocking a trans-ac-tion, flag-ging an account---
  []
 
 
 
 
-Underfull \hbox (badness 1735) in paragraph at lines 221--222
-[]\T1/ptm/m/n/10 Our train-ing ef-fi-ciency ex-per-i-ments show con-ver-gence
- []
+LaTeX Warning: Citation `Captum' on page 5 undefined on input line 557.
 
 
-Underfull \hbox (badness 2799) in paragraph at lines 235--236
-[]\T1/ptm/m/n/10 However, sev-eral lim-i-ta-tions de-serve ac-knowl-edg-ment.
+LaTeX Warning: Citation `IntGradients' on page 5 undefined on input line 564.
+
+
+Underfull \hbox (badness 1466) in paragraph at lines 562--568
+\T1/ptm/m/n/10 out-put. The at-tri-bu-tions sat-isfy the com-plete-ness ax-iom:
+
  []
 
 
 
 [5]
+Underfull \hbox (badness 1721) in paragraph at lines 588--591
+[]\T1/ptm/b/n/10 Heatmap rel-e-vance\T1/ptm/m/n/10 : for syn-thetic tam-pered c
+hecks
+ []
 
 
 
-[6]
+<Full-Analyses-Dashboard.png, id=128, 1460.45625pt x 843.15pt>
+File: Full-Analyses-Dashboard.png Graphic file (type png)
+<use Full-Analyses-Dashboard.png>
+Package pdftex.def Info: Full-Analyses-Dashboard.png  used on input line 664.
+(pdftex.def)             Requested size: 239.39923pt x 138.2003pt.
+<Risk-Analyses.png, id=130, 1015.795pt x 839.135pt>
+File: Risk-Analyses.png Graphic file (type png)
+<use Risk-Analyses.png>
+Package pdftex.def Info: Risk-Analyses.png  used on input line 672.
+(pdftex.def)             Requested size: 239.39923pt x 197.76013pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+[6 <./Full-Analyses-Dashboard.png>]
+<analyses-result-fraud.png, id=144, 1098.1025pt x 829.0975pt>
+File: analyses-result-fraud.png Graphic file (type png)
+<use analyses-result-fraud.png>
+Package pdftex.def Info: analyses-result-fraud.png  used on input line 690.
+(pdftex.def)             Requested size: 120.95892pt x 91.32751pt.
+
+Overfull \hbox (6.79999pt too wide) in paragraph at lines 690--692
+[][] 
+ []
+
+
+Underfull \hbox (badness 3954) in paragraph at lines 692--692
+\T1/ptm/m/n/10 trated on im-age and text
+ []
+
+<Analyses-Result-low.png, id=145, 991.705pt x 838.13126pt>
+File: Analyses-Result-low.png Graphic file (type png)
+<use Analyses-Result-low.png>
+Package pdftex.def Info: Analyses-Result-low.png  used on input line 696.
+(pdftex.def)             Requested size: 120.95892pt x 102.22116pt.
+
+Overfull \hbox (6.79999pt too wide) in paragraph at lines 696--698
+[][] 
+ []
+
+<Image-heatmap.png, id=146, 981.6675pt x 838.13126pt>
+File: Image-heatmap.png Graphic file (type png)
+<use Image-heatmap.png>
+Package pdftex.def Info: Image-heatmap.png  used on input line 707.
+(pdftex.def)             Requested size: 239.39923pt x 204.39119pt.
+
+LaTeX Warning: Citation `IntGradients' on page 7 undefined on input line 709.
+
+
+LaTeX Warning: Citation `IntGradients' on page 7 undefined on input line 709.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+
+<Image-only-dashboard.png, id=147, 1475.5125pt x 835.12pt>
+File: Image-only-dashboard.png Graphic file (type png)
+<use Image-only-dashboard.png>
+Package pdftex.def Info: Image-only-dashboard.png  used on input line 715.
+(pdftex.def)             Requested size: 239.39923pt x 135.49513pt.
+
+LaTeX Warning: Citation `FastAPI' on page 7 undefined on input line 738.
+
+
+
+[7 <./Risk-Analyses.png> <./analyses-result-fraud.png> <./Analyses-Result-low.p
+ng> <./Image-heatmap.png> <./Image-only-dashboard.png>]
+Underfull \hbox (badness 3158) in paragraph at lines 756--756
+\T1/ptm/m/n/8 score, at-ten-tion weights, per-branch
+ []
+
+
+Overfull \hbox (6.73225pt too wide) in paragraph at lines 756--756
+[]|\T1/pcr/m/n/8 /api/analyze-image| 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 756--756
+[]|\T1/ptm/m/n/8 Image-only work-flow. Runs OCR,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 756--756
+\T1/ptm/m/n/8 in-fer-ence. Re-turns same re-sponse
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 756--756
+[]|\T1/ptm/m/n/8 Serves the in-ter-ac-tive dash-board
+ []
+
+
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Trained on real IEEE-CIS +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Validated with
+ []
+
+
+Underfull \hbox (badness 2351) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Strong pre-trained en-coder; syn-
+ []
+
+
+Underfull \hbox (badness 5862) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Consistency and san-ity checks
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Rule-based; de-ter-min-is-tic on
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Communication
+ []
+
+
+Underfull \hbox (badness 4913) in paragraph at lines 847--847
+[]|\T1/ptm/m/n/8 Not pri-mary ev-i-dence; demon-
+ []
+
+
+
+[8]
+
+
+
+[9]
 No file FraudLens_IEEE_Report.bbl.
 
 ** Conference Paper **
@@ -809,7 +1052,7 @@ Before submitting the final camera ready copy, remember to:
 
 
 
-[7
+[10
 
 ] (./FraudLens_IEEE_Report.aux)
  ***********
@@ -829,31 +1072,34 @@ Package rerunfilecheck Warning: File `FraudLens_IEEE_Report.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `FraudLens_IEEE_Report.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  76E6ADCCC534D3584283F1A9C08751FD;1884.
+(rerunfilecheck)             Before: 76E6ADCCC534D3584283F1A9C08751FD;1884
+(rerunfilecheck)             After:  F561E7F74421BF6111469B5B7AB02210;6428.
  ) 
 Here is how much of TeX's memory you used:
- 14122 strings out of 473190
- 228737 string characters out of 5715801
- 630194 words of memory out of 5000000
- 37173 multiletter control sequences out of 15000+600000
- 682763 words of font info for 176 fonts, out of 8000000 for 9000
+ 15268 strings out of 473190
+ 239772 string characters out of 5715801
+ 662945 words of memory out of 5000000
+ 38206 multiletter control sequences out of 15000+600000
+ 689148 words of font info for 193 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,9n,79p,1704b,441s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
-></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><
-/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></
-usr/local/texlive/2025/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb></usr/loca
-l/texlive/2025/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texliv
-e/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2025/texm
-f-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/texmf-dist/fon
-ts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/
-urw/times/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/
-utmri8a.pfb>
-Output written on FraudLens_IEEE_Report.pdf (7 pages, 131658 bytes).
+ 75i,15n,79p,321b,1081s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
+></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
+usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></u
+sr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb
+></usr/local/texlive/2025/texmf-dist/fonts/type1/public/rsfs/rsfs10.pfb></usr/l
+ocal/texlive/2025/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/tex
+live/2025/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2025/t
+exmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2025/texmf-dist/f
+onts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1
+/urw/times/utmbi8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/time
+s/utmr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/urw/times/utmri8a.
+pfb>
+Output written on FraudLens_IEEE_Report.pdf (10 pages, 2416899 bytes).
 PDF statistics:
- 115 PDF objects out of 1000 (max. 8388607)
- 85 compressed objects within 1 object stream
- 28 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 270 PDF objects out of 1000 (max. 8388607)
+ 216 compressed objects within 3 object streams
+ 92 named destinations out of 1000 (max. 500000)
+ 132 words of extra memory for PDF output out of 10000 (max. 10000000)
 
