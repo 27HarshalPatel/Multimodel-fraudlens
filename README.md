@@ -133,6 +133,8 @@ Multimodal-fraudlens/
 ├── docker-compose.yml           # Compose for API + training
 ├── pyproject.toml               # Python project metadata & deps
 ├── requirements.txt             # Pip requirements
+├── FraudLens-Demo-video.mp4     # Demo video in .mp4 format
+├── demo.gif                     # Demo video in .gif format
 ├── configs/
 │   └── default.yaml             # Model & training hyperparameters
 ├── dashboard/
