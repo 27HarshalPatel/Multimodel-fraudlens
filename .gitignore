@@ -1,6 +1,32 @@
+# Data & model artifacts
 data/
 checkpoints/
 *.pt
 *.csv
+runs/
+
+# Build artifacts
 graphify-out/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv*/
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# IDE / tool configs
+.claude/
+.code-review-graph/
+profile_repo/
+
+# Temp files
+allfiles.txt
+pdf_text.txt

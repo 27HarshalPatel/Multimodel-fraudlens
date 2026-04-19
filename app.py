@@ -124,7 +124,293 @@ SUSPICIOUS_TEXT_KEYWORDS = {
     "logon": 0.85, "login": 0.85, "notice": 0.70, "alert": 0.75,
     "cancel": 0.80, "http": 0.85, "https": 0.85,
     "toll": 0.85, "unpaid": 0.85, "bill": 0.50, "late": 0.75,
+    # Document fraud keywords
+    "fake": 1.0, "forged": 1.0, "counterfeit": 1.0, "forgery": 1.0,
+    "fabricated": 0.95, "falsified": 0.95, "fraudulent": 0.95,
+    "abuse": 0.90, "tampered": 0.90, "altered": 0.80,
+    "specimen": 0.85, "sample": 0.70, "template": 0.75,
+    "placeholder": 0.85, "dummy": 0.80, "test": 0.50,
 }
+
+# Phrases that are dead giveaways of document fraud (checked as substrings)
+DOCUMENT_FRAUD_PHRASES = [
+    "fake receipt", "fake invoice", "fake check", "fake cheque",
+    "forged document", "forged receipt", "counterfeit",
+    "not valid", "void", "specimen", "sample only",
+    "interbank giro abuse",  # Specific to this type of fake receipt
+]
+
+
+def _detect_document_fraud(text: str) -> tuple[float, list[str]]:
+    """Detect document fraud indicators in OCR text.
+
+    Returns (fraud_boost_score, reasons) where fraud_boost_score is 0-100.
+    This catches textual fraud signals the ML model misses because it was
+    trained on transaction metadata, not document content analysis.
+
+    Detection layers:
+      1. Dead-giveaway keyword/phrase matching
+      2. Placeholder amount detection
+      3. Balance calculation verification
+      4. Gibberish / nonsensical text detection
+      5. Future date detection
+      6. Structural anomalies (duplicate dates, missing fields)
+    """
+    import re
+    from datetime import datetime
+
+    lower = text.lower()
+    score = 0.0
+    reasons = []
+    red_flags = 0  # Count independent red flags for cumulative scoring
+
+    # ── 1. Dead-giveaway phrases ─────────────────────────────────────
+    for phrase in DOCUMENT_FRAUD_PHRASES:
+        if phrase in lower:
+            score = max(score, 95.0)
+            reasons.append(f"Document contains fraud indicator: '{phrase}'")
+
+    # ── 2. Placeholder amounts (e.g., -RMXXX, $XXX, XXXXX) ──────────
+    placeholder_patterns = [
+        r'-rm[x]+',       # -RMXXX, -RMXXXX
+        r'\$[x]+',        # $XXX
+        r'\b[x]{3,}\b',   # XXX, XXXX (standalone)
+    ]
+    for pat in placeholder_patterns:
+        if re.search(pat, lower):
+            score = max(score, 85.0)
+            reasons.append("Document contains placeholder amounts (not real monetary values)")
+            red_flags += 1
+            break
+
+    # ── 3. Balance calculation verification ──────────────────────────
+    # Look for monetary amounts and check if running balances are consistent
+    money_pattern = r'[-+]?\$?[\d,]+\.\d{2}'
+    amounts = re.findall(money_pattern, text)
+    if len(amounts) >= 4:
+        # Parse amounts to floats
+        parsed = []
+        for a in amounts:
+            try:
+                val = float(a.replace('$', '').replace(',', '').replace('+', ''))
+                parsed.append(val)
+            except ValueError:
+                continue
+
+        if len(parsed) >= 4:
+            # Check for impossible balance jumps (e.g., balance goes UP after withdrawal)
+            # Look for patterns like: withdrawal=-154.67, balance stays same or increases
+            balance_errors = 0
+            for i in range(len(parsed) - 2):
+                curr = parsed[i]
+                nxt = parsed[i + 1]
+                # If both are "balance-sized" (>100) and differ by impossible amounts
+                if curr > 100 and nxt > 100:
+                    diff = abs(nxt - curr)
+                    # If balance changes by implausible amount (>1000% of previous)
+                    if diff > curr * 10 and diff > 1000:
+                        balance_errors += 1
+
+            # Check if running balance doesn't decrease after withdrawals
+            # Look for lines with negative amounts followed by same/higher balance
+            withdrawal_balance_pairs = re.findall(
+                r'[-](\d+\.?\d*)\s+.*?\$?([\d,]+\.?\d*)',
+                text
+            )
+
+            # Look for specific patterns: negative amount but balance unchanged/increased
+            lines = text.split('\n')
+            balance_inconsistencies = 0
+            prev_balance = None
+            for line in lines:
+                line_amounts = re.findall(r'[-+]?\$?[\d,]+\.\d{2}', line)
+                if len(line_amounts) >= 2:
+                    try:
+                        # Last amount in line is usually the balance
+                        curr_balance = float(line_amounts[-1].replace('$', '').replace(',', ''))
+                        # Check for withdrawal (negative amount)
+                        for am in line_amounts[:-1]:
+                            val = float(am.replace('$', '').replace(',', '').replace('+', ''))
+                            if am.startswith('-') and prev_balance is not None:
+                                expected = prev_balance - abs(val)
+                                if abs(curr_balance - expected) > 1.0 and curr_balance != prev_balance:
+                                    balance_inconsistencies += 1
+                        prev_balance = curr_balance
+                    except (ValueError, IndexError):
+                        continue
+
+            if balance_inconsistencies >= 2:
+                score = max(score, 85.0)
+                reasons.append(
+                    f"Balance calculation errors detected ({balance_inconsistencies} "
+                    f"inconsistencies in running balance)"
+                )
+                red_flags += 2
+
+    # ── 4. Gibberish / nonsensical text detection ────────────────────
+    # Real bank statements have proper English in fine print.
+    # Fake ones often have garbled text to fill space.
+    words = lower.split()
+    if len(words) >= 10:
+        # Common English words that should appear in real documents
+        common_words = {
+            'the', 'and', 'is', 'in', 'to', 'of', 'a', 'for', 'on',
+            'with', 'this', 'that', 'are', 'be', 'it', 'an', 'or',
+            'at', 'by', 'not', 'your', 'from', 'but', 'we', 'all',
+            'have', 'has', 'will', 'may', 'can', 'any', 'no', 'if',
+        }
+
+        # Check the last 30% of words (fine print / footer area)
+        footer_start = int(len(words) * 0.7)
+        footer_words = words[footer_start:]
+
+        if len(footer_words) >= 8:
+            # Count words that look like gibberish
+            gibberish_count = 0
+            for w in footer_words:
+                cleaned = re.sub(r'[^a-z]', '', w)
+                if len(cleaned) < 2:
+                    continue
+                # Long words with unusual letter patterns
+                if len(cleaned) > 12:
+                    gibberish_count += 1
+                # Words with too many consonant clusters
+                elif re.search(r'[bcdfghjklmnpqrstvwxyz]{4,}', cleaned):
+                    gibberish_count += 1
+                # Very unusual letter combinations
+                elif re.search(r'(qq|xx|zz|ww|hh|jj|kk)', cleaned):
+                    gibberish_count += 1
+
+            gibberish_ratio = gibberish_count / max(len(footer_words), 1)
+            if gibberish_ratio > 0.25:
+                score = max(score, 75.0)
+                reasons.append(
+                    f"Gibberish/nonsensical text detected in document footer "
+                    f"({gibberish_count}/{len(footer_words)} suspicious words)"
+                )
+                red_flags += 1
+
+    # ── 5. Future date detection ─────────────────────────────────────
+    # Financial statements dated far in the future are suspicious
+    current_year = datetime.now().year
+    year_matches = re.findall(r'\b(20[2-3]\d)\b', text)
+    for yr_str in year_matches:
+        yr = int(yr_str)
+        if yr > current_year:
+            score = max(score, 65.0)
+            reasons.append(f"Document contains future date (year {yr})")
+            red_flags += 1
+            break
+
+    # Check for month references with future year
+    future_date_patterns = re.findall(
+        r'(january|february|march|april|may|june|july|august|september|'
+        r'october|november|december)\s+\d{1,2},?\s+(20[2-3]\d)',
+        lower
+    )
+    for month, yr_str in future_date_patterns:
+        if int(yr_str) > current_year:
+            score = max(score, 70.0)
+            if f"future date (year {yr_str})" not in str(reasons):
+                reasons.append(f"Statement dated in the future: {month} {yr_str}")
+            red_flags += 1
+            break
+
+    # ── 6. Structural anomalies ──────────────────────────────────────
+    # Duplicate dates with different transactions
+    date_pattern = r'\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*(\d{1,2})\b'
+    dates_found = re.findall(date_pattern, lower)
+    if dates_found:
+        date_strings = [f"{m} {d}" for m, d in dates_found]
+        from collections import Counter
+        date_counts = Counter(date_strings)
+        duplicates = {d: c for d, c in date_counts.items() if c > 1}
+        if duplicates:
+            dup_info = ", ".join(f"{d} ({c}x)" for d, c in duplicates.items())
+            score = max(score, 55.0)
+            reasons.append(f"Duplicate transaction dates found: {dup_info}")
+            red_flags += 1
+
+    # Account summary vs transaction mismatch
+    # Look for "Total Withdrawals" or "Total Deposits" in summary
+    summary_total = re.search(r'total\s+(?:withdrawals?|debits?)\s*:?\s*\$?([\d,]+\.?\d*)', lower)
+    if summary_total:
+        try:
+            claimed_total = float(summary_total.group(1).replace(',', ''))
+            # Sum withdrawal amounts ONLY from transaction lines (lines with dates)
+            txn_line_re = re.compile(
+                r'(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s*\d{1,2}',
+                re.IGNORECASE,
+            )
+            actual_total = 0.0
+            for line in text.split('\n'):
+                if txn_line_re.search(line):
+                    for amt in re.findall(r'-(\d+\.?\d*)', line):
+                        val = float(amt)
+                        if 0.01 < val < 100000:
+                            actual_total += val
+            if actual_total > 0 and abs(claimed_total - actual_total) > 10:
+                score = max(score, 75.0)
+                reasons.append(
+                    f"Account summary mismatch: claimed total withdrawals "
+                    f"${claimed_total:,.2f} vs actual sum ${actual_total:,.2f}"
+                )
+                red_flags += 1
+        except (ValueError, IndexError):
+            pass
+
+    # Missing critical fields for bank statements
+    is_bank_statement = any(w in lower for w in [
+        'bank', 'statement', 'account summary', 'beginning balance',
+        'ending balance', 'account number',
+    ])
+    if is_bank_statement:
+        has_routing = bool(re.search(r'routing\s*(number|#|no)', lower))
+        has_swift = bool(re.search(r'swift|iban|bic', lower))
+        has_phone = bool(re.search(r'\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', text))
+        has_website = bool(re.search(r'www\.|\.com|\.org|\.net', lower))
+
+        missing = []
+        if not has_phone:
+            missing.append("phone number")
+        if not has_website:
+            missing.append("website")
+
+        if len(missing) >= 2:
+            score = max(score, 50.0)
+            reasons.append(
+                f"Bank statement missing expected fields: {', '.join(missing)}"
+            )
+            red_flags += 1
+
+    # ── Cumulative scoring: multiple independent red flags ────────────
+    # If 3+ independent fraud signals are found, it's almost certainly fake
+    if red_flags >= 3:
+        score = max(score, 90.0)
+        if "Multiple independent fraud indicators" not in str(reasons):
+            reasons.append(
+                f"Multiple independent fraud indicators detected ({red_flags} red flags)"
+            )
+    elif red_flags >= 2:
+        score = max(score, 80.0)
+
+    # ── Missing critical receipt fields (existing check) ─────────────
+    if score < 50:  # Only run if nothing else triggered
+        has_business_name = any(w in lower for w in [
+            "inc", "llc", "ltd", "corp", "store", "shop", "restaurant", "bank"
+        ])
+        has_tax_id = bool(re.search(r'\b(tax|tin|ein|gst|vat)\s*[:#]?\s*\d', lower))
+        has_receipt_number = bool(re.search(r'(receipt|invoice|order)\s*[#:]?\s*\d', lower))
+
+        if not has_business_name and not has_tax_id and not has_receipt_number:
+            if any(w in lower for w in ["receipt", "invoice", "balance", "total"]):
+                score = max(score, 60.0)
+                reasons.append(
+                    "Document claims to be receipt/invoice but lacks "
+                    "business name, tax ID, or receipt number"
+                )
+
+    return score, reasons
 
 
 def _detect_phishing_keywords(text: str) -> tuple[list[str], bool]:
@@ -336,6 +622,9 @@ async def analyze_image(
     if not reasons:
         reasons.append("Image analysis complete — no significant risk indicators")
 
+    # ── Document fraud detection on OCR text ────────────────────────
+    doc_fraud_score, doc_fraud_reasons = _detect_document_fraud(extracted_text)
+
     # ── Use model if available ───────────────────────────────────────
     if predictor is not None:
         try:
@@ -349,9 +638,43 @@ async def analyze_image(
             result["text_attributions"] = result.get("text_attributions", text_attrs)
             if not result.get("image_explanation_base64"):
                 result["image_explanation_base64"] = heatmap_b64
+
+            # ── Augment model score with OCR document fraud detection ──
+            # The model was trained on financial transaction patterns,
+            # NOT document content analysis.  When OCR text contains
+            # obvious fraud signals ("FAKE RECEIPT", placeholder amounts),
+            # we boost the model's score to reflect this evidence.
+            if doc_fraud_score > result["fraud_score"]:
+                logger.info(
+                    "OCR fraud detection boosted score: %.1f → %.1f (reasons: %s)",
+                    result["fraud_score"], doc_fraud_score, doc_fraud_reasons,
+                )
+                result["fraud_score"] = round(doc_fraud_score, 1)
+                # Update risk level
+                if doc_fraud_score >= 80:
+                    result["risk_level"] = "Critical"
+                elif doc_fraud_score >= 60:
+                    result["risk_level"] = "High"
+                elif doc_fraud_score >= 35:
+                    result["risk_level"] = "Medium"
+                # Prepend document fraud reasons
+                existing_reasons = result.get("risk_reasons", [])
+                result["risk_reasons"] = doc_fraud_reasons + existing_reasons
+
             return JSONResponse(result)
         except Exception as e:
             logger.warning("Model image-only prediction failed, using heuristic: %s", e)
+
+    # Apply document fraud boost to heuristic score
+    if doc_fraud_score > fused_score:
+        fused_score = round(doc_fraud_score, 1)
+        reasons = doc_fraud_reasons + reasons
+        if fused_score >= 80:
+            risk_level = "CRITICAL"
+        elif fused_score >= 60:
+            risk_level = "HIGH"
+        elif fused_score >= 35:
+            risk_level = "MEDIUM"
 
     return JSONResponse({
         "fraud_score": fused_score,

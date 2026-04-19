@@ -92,13 +92,32 @@ class FraudLensPredictor:
 
     # ── Tabular preprocessing ─────────────────────────────────────────
 
+    # Approximate median values for features not provided by the UI.
+    # These are derived from the IEEE-CIS training data distribution
+    # and ensure the model sees "typical normal transaction" values
+    # instead of all-zeros, which would be far outside the training
+    # distribution and cause the tabular branch to saturate.
+    _V_MEDIANS = {
+        "V1": 1.0, "V2": 1.0, "V3": 1.0, "V4": 1.0, "V5": 0.0,
+        "V6": 1.0, "V7": 1.0, "V8": 1.0, "V9": 0.0, "V10": 0.0,
+        "V11": 1.0, "V12": 1.0, "V13": 1.0, "V14": 1.0, "V15": 0.0,
+        "V16": 0.0, "V17": 1.0, "V18": 0.0, "V19": 1.0, "V20": 1.0,
+    }
+    _C_MEDIANS = {
+        "C1": 1.0, "C2": 1.0, "C3": 0.0, "C4": 0.0, "C5": 0.0,
+        "C6": 1.0, "C7": 0.0, "C8": 0.0, "C9": 0.0, "C10": 0.0,
+    }
+    _D_MEDIANS = {
+        "D1": 14.0, "D2": 14.0, "D3": 13.0, "D4": 94.0, "D5": 56.0,
+    }
+
     def _preprocess_tabular(self, raw: dict) -> torch.Tensor:
         """Convert a flat dict of form fields into a 52-d float tensor.
 
         We mirror the feature engineering in ``TabularDataset.__init__``.
-        Without a saved scaler the values are **not** standardised;
-        the model still returns reasonable scores because BN layers
-        adapt.  For production, persist and load the training scaler.
+        Missing V/C/D features are filled with approximate training medians
+        (from IEEE-CIS data) rather than zeros, which prevents the tabular
+        branch from seeing an artificially extreme input pattern.
         """
         features: list[float] = []
 
@@ -106,34 +125,63 @@ class FraudLensPredictor:
         amt = float(raw.get("TransactionAmt", 0) or 0)
         features.append(np.log1p(max(amt, 0)))
 
-        # 2) time_sin, time_cos
-        dt = float(raw.get("TransactionDT", 0) or 0)
+        # 2) time_sin, time_cos  (use realistic mid-day default)
+        dt = float(raw.get("TransactionDT", 43200) or 43200)
         seconds_in_day = 86400
         tod = dt % seconds_in_day
         features.append(float(np.sin(2 * np.pi * tod / seconds_in_day)))
         features.append(float(np.cos(2 * np.pi * tod / seconds_in_day)))
 
         # 3) Numeric cols (7)
+        #    For cols not provided by UI, use realistic defaults
+        NUMERIC_DEFAULTS = {
+            "TransactionAmt": amt,
+            "card1": 4000,   # Typical card1 hash value
+            "card2": 321,    # Mid-range card2
+            "card3": 150,    # Typical card3
+            "card5": 225,    # Typical card5
+            "addr1": 299,    # Most common addr1
+            "addr2": 87,     # Most common addr2 (US)
+        }
         for col in self.NUMERIC_COLS:
-            features.append(float(raw.get(col, 0) or 0))
+            val = raw.get(col)
+            if val is not None and val != "" and val != 0:
+                features.append(float(val))
+            else:
+                features.append(float(NUMERIC_DEFAULTS.get(col, 0)))
 
-        # 4) V features (V1..V20 → 20 dims)
+        # 4) V features (V1..V20 → 20 dims, fill with training medians)
         for i in range(1, 21):
-            features.append(float(raw.get(f"V{i}", 0) or 0))
+            key = f"V{i}"
+            val = raw.get(key)
+            if val is not None and val != "" and val != 0:
+                features.append(float(val))
+            else:
+                features.append(float(self._V_MEDIANS.get(key, 0.0)))
 
-        # 5) C features (C1..C10 → 10 dims)
+        # 5) C features (C1..C10 → 10 dims, fill with training medians)
         for i in range(1, 11):
-            features.append(float(raw.get(f"C{i}", 0) or 0))
+            key = f"C{i}"
+            val = raw.get(key)
+            if val is not None and val != "" and val != 0:
+                features.append(float(val))
+            else:
+                features.append(float(self._C_MEDIANS.get(key, 0.0)))
 
-        # 6) D features (D1..D5 → 5 dims)
+        # 6) D features (D1..D5 → 5 dims, fill with training medians)
         for i in range(1, 6):
-            features.append(float(raw.get(f"D{i}", 0) or 0))
+            key = f"D{i}"
+            val = raw.get(key)
+            if val is not None and val != "" and val != 0:
+                features.append(float(val))
+            else:
+                features.append(float(self._D_MEDIANS.get(key, 0.0)))
 
         # 7) Categorical cols label-encoded (7 dims)
         #    Use stable encoding maps that approximate training LabelEncoder output.
         #    hash(val) % 1000 produced extreme values the model never saw.
         CAT_ENCODING = {
-            "ProductCD": {"W": 0, "H": 1, "C": 2, "S": 3, "R": 4},
+            "ProductCD": {"w": 0, "h": 1, "c": 2, "s": 3, "r": 4},
             "card4": {"visa": 0, "mastercard": 1, "discover": 2, "american express": 3},
             "card6": {"debit": 0, "credit": 1, "charge": 2, "debit or credit": 3},
             "P_emaildomain": {
@@ -146,8 +194,8 @@ class FraudLensPredictor:
             },
             "DeviceType": {"desktop": 0, "mobile": 1},
             "DeviceInfo": {
-                "Windows": 0, "iOS Device": 1, "MacOS": 2, "Linux": 3,
-                "Trident/7.0": 4, "rv:11.0": 5,
+                "windows": 0, "ios device": 1, "macos": 2, "linux": 3,
+                "trident/7.0": 4, "rv:11.0": 5,
             },
         }
         for col in self.CATEGORICAL_COLS:
