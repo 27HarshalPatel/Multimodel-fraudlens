@@ -132,20 +132,49 @@ Multimodal-fraudlens/
 ├── Dockerfile                   # Multi-stage Docker build
 ├── docker-compose.yml           # Compose for API + training
 ├── pyproject.toml               # Python project metadata & deps
-├── configs/                     # Default YAML configurations
+├── requirements.txt             # Pip requirements
+├── configs/
+│   └── default.yaml             # Model & training hyperparameters
+├── checkpoints/
+│   └── best_model.pt            # Trained model weights
 ├── dashboard/
 │   ├── index.html               # Tab-based UI (Image Scan / Full Analysis)
 │   ├── style.css                # Premium dark glassmorphism theme
-│   └── app.js                   # UI logic, OCR rendering, gauge animation
+│   └── app.js                   # Tab switching, OCR rendering, gauge animation
 ├── src/
-│   ├── inference.py             # Single-sample predictor wrappers
-│   ├── models/                  # Tabular, Image, Text Branches + Fusion Core
-│   ├── data/                    # Dataset loaders, orchestrators & synthesizers
-│   ├── training/                # Training loop, losses, metrics
-│   └── explain/                 # Captum-based explainability definitions
-├── data/                        # Datasets (Tabular, Images, Text, Paysim, Processed)
-├── docs/                        # Papers and Architecture details
+│   ├── config.py                # Config loader
+│   ├── inference.py             # Single-sample predictor (predict + predict_image_only)
+│   ├── models/
+│   │   ├── fraudlens.py         # Main multimodal model (FraudLensModel)
+│   │   ├── fusion.py            # ★ Cross-modal attention fusion (AttentionFusion)
+│   │   ├── tabular_branch.py    # MLP branch (52 features → 128-d)
+│   │   ├── image_branch.py      # SigLIP 2 vision encoder → 128-d
+│   │   └── text_branch.py       # DistilBERT → 128-d
+│   ├── data/
+│   │   ├── dataset.py           # Unified multimodal dataset loader
+│   │   ├── tabular_dataset.py   # IEEE-CIS + PaySim tabular loader
+│   │   ├── multimodal_dataset.py
+│   │   ├── image_dataset.py
+│   │   ├── text_dataset.py
+│   │   ├── generate_synthetic.py  # Synthetic image + text generators
+│   │   ├── synthesizer.py       # SMS phishing + toll scam data synthesizer
+│   │   └── download_data.py     # Kaggle data downloader
+│   ├── training/
+│   │   ├── train.py             # CLI entrypoint (single GPU / DDP)
+│   │   ├── trainer.py           # Training loop (mixed precision, early stopping)
+│   │   ├── losses.py            # Focal Loss + MultiModal auxiliary loss
+│   │   └── metrics.py           # AUROC, AUPRC, F1, optimal threshold
+│   └── explain/
+│       └── captum_explainer.py  # Integrated Gradients (text + image)
+├── data/
+│   ├── tabular/                 # IEEE-CIS transaction CSVs
+│   ├── images/                  # Check images (normal + tampered)
+│   ├── text/                    # Transaction descriptions
+│   ├── paysim/                  # PaySim synthetic financial data
+│   └── processed/               # Blended multimodal CSVs
+├── docs/                        # Architecture diagrams, blueprint
 ├── runs/                        # TensorBoard logs
+├── Screenshots/                 # System screenshots for documentation
 └── tests/                       # Test suite
 ```
 
@@ -324,11 +353,3 @@ We want developers and researchers examining FraudLens to confidently understand
 This project is licensed under the **MIT License** — see [pyproject.toml](pyproject.toml) for details.
 
 ---
-
-<div align="center">
-
-**Built with ❤️ using AI and Modern Web Technologies**
-
-Made possible by [PyTorch](https://pytorch.org/) • [FastAPI](https://fastapi.tiangolo.com/) • [HuggingFace](https://huggingface.co/)
-
-</div>
