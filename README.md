@@ -195,7 +195,7 @@ Multimodal-fraudlens/
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/27HarshalPatel/FraudLens.git
+   git clone https://github.com/27HarshalPatel/Multimodel-fraudlens.git
    cd FraudLens
    ```
 
