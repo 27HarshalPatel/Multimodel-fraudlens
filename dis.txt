@@ -1,0 +1,598 @@
+  1           0 LOAD_CONST               0 ('Captum model explainer for FraudLens.')
+              2 STORE_NAME               0 (__doc__)
+
+  3           4 LOAD_CONST               1 (0)
+              6 LOAD_CONST               2 (None)
+              8 IMPORT_NAME              1 (base64)
+             10 STORE_NAME               1 (base64)
+
+  4          12 LOAD_CONST               1 (0)
+             14 LOAD_CONST               2 (None)
+             16 IMPORT_NAME              2 (io)
+             18 STORE_NAME               2 (io)
+
+  5          20 LOAD_CONST               1 (0)
+             22 LOAD_CONST               2 (None)
+             24 IMPORT_NAME              3 (logging)
+             26 STORE_NAME               3 (logging)
+
+  7          28 LOAD_CONST               1 (0)
+             30 LOAD_CONST               2 (None)
+             32 IMPORT_NAME              4 (matplotlib)
+             34 STORE_NAME               4 (matplotlib)
+
+  8          36 LOAD_CONST               1 (0)
+             38 LOAD_CONST               2 (None)
+             40 IMPORT_NAME              5 (matplotlib.pyplot)
+             42 IMPORT_FROM              6 (pyplot)
+             44 STORE_NAME               7 (plt)
+             46 POP_TOP
+
+  9          48 LOAD_CONST               1 (0)
+             50 LOAD_CONST               2 (None)
+             52 IMPORT_NAME              8 (numpy)
+             54 STORE_NAME               9 (np)
+
+ 10          56 LOAD_CONST               1 (0)
+             58 LOAD_CONST               2 (None)
+             60 IMPORT_NAME             10 (torch)
+             62 STORE_NAME              10 (torch)
+
+ 11          64 LOAD_CONST               1 (0)
+             66 LOAD_CONST               3 (('IntegratedGradients', 'LayerIntegratedGradients'))
+             68 IMPORT_NAME             11 (captum.attr)
+             70 IMPORT_FROM             12 (IntegratedGradients)
+             72 STORE_NAME              12 (IntegratedGradients)
+             74 IMPORT_FROM             13 (LayerIntegratedGradients)
+             76 STORE_NAME              13 (LayerIntegratedGradients)
+             78 POP_TOP
+
+ 13          80 LOAD_NAME                4 (matplotlib)
+             82 LOAD_METHOD             14 (use)
+             84 LOAD_CONST               4 ('Agg')
+             86 CALL_METHOD              1
+             88 POP_TOP
+
+ 14          90 LOAD_NAME                3 (logging)
+             92 LOAD_METHOD             15 (getLogger)
+             94 LOAD_NAME               16 (__name__)
+             96 CALL_METHOD              1
+             98 STORE_NAME              17 (logger)
+
+ 17         100 LOAD_BUILD_CLASS
+            102 LOAD_CONST               5 (<code object CaptumExplainer at 0x106ec4ea0, file "src/explain/captum_explainer.py", line 17>)
+            104 LOAD_CONST               6 ('CaptumExplainer')
+            106 MAKE_FUNCTION            0
+            108 LOAD_CONST               6 ('CaptumExplainer')
+            110 CALL_FUNCTION            2
+            112 STORE_NAME              18 (CaptumExplainer)
+            114 LOAD_CONST               2 (None)
+            116 RETURN_VALUE
+
+Disassembly of <code object CaptumExplainer at 0x106ec4ea0, file "src/explain/captum_explainer.py", line 17>:
+ 17           0 LOAD_NAME                0 (__name__)
+              2 STORE_NAME               1 (__module__)
+              4 LOAD_CONST               0 ('CaptumExplainer')
+              6 STORE_NAME               2 (__qualname__)
+
+ 18           8 LOAD_CONST               1 ('Generates deep multimodal explanations using Captum.')
+             10 STORE_NAME               3 (__doc__)
+
+ 20          12 LOAD_CONST               2 (<code object __init__ at 0x106ec4870, file "src/explain/captum_explainer.py", line 20>)
+             14 LOAD_CONST               3 ('CaptumExplainer.__init__')
+             16 MAKE_FUNCTION            0
+             18 STORE_NAME               4 (__init__)
+
+ 25          20 LOAD_CONST               8 ((None, None, 100.0))
+             22 LOAD_CONST               6 (<code object explain at 0x106ec4df0, file "src/explain/captum_explainer.py", line 25>)
+             24 LOAD_CONST               7 ('CaptumExplainer.explain')
+             26 MAKE_FUNCTION            1 (defaults)
+             28 STORE_NAME               5 (explain)
+             30 LOAD_CONST               4 (None)
+             32 RETURN_VALUE
+
+Disassembly of <code object __init__ at 0x106ec4870, file "src/explain/captum_explainer.py", line 20>:
+ 21           0 LOAD_FAST                1 (model)
+              2 LOAD_FAST                0 (self)
+              4 STORE_ATTR               0 (model)
+
+ 22           6 LOAD_FAST                2 (device)
+              8 LOAD_FAST                0 (self)
+             10 STORE_ATTR               1 (device)
+
+ 23          12 LOAD_FAST                0 (self)
+             14 LOAD_ATTR                0 (model)
+             16 LOAD_METHOD              2 (eval)
+             18 CALL_METHOD              0
+             20 POP_TOP
+             22 LOAD_CONST               0 (None)
+             24 RETURN_VALUE
+
+Disassembly of <code object explain at 0x106ec4df0, file "src/explain/captum_explainer.py", line 25>:
+ 27           0 BUILD_LIST               0
+              2 LOAD_CONST               1 (None)
+              4 LOAD_CONST               2 (('text_attributions', 'image_explanation_base64'))
+              6 BUILD_CONST_KEY_MAP      2
+              8 STORE_FAST               8 (out)
+
+ 28          10 LOAD_DEREF               0 (self)
+             12 LOAD_ATTR                0 (model)
+             14 LOAD_METHOD              1 (zero_grad)
+             16 CALL_METHOD              0
+             18 POP_TOP
+
+ 33          20 LOAD_FAST                3 (txt_ids)
+             22 LOAD_CONST               1 (None)
+             24 IS_OP                    1
+             26 EXTENDED_ARG             1
+             28 POP_JUMP_IF_FALSE      314
+             30 LOAD_FAST                6 (tokens)
+             32 LOAD_CONST               1 (None)
+             34 IS_OP                    1
+             36 EXTENDED_ARG             1
+             38 POP_JUMP_IF_FALSE      314
+
+ 34          40 LOAD_CLOSURE             0 (self)
+             42 BUILD_TUPLE              1
+             44 LOAD_CONST               3 (<code object custom_txt_fwd at 0x106ec4b30, file "src/explain/captum_explainer.py", line 34>)
+             46 LOAD_CONST               4 ('CaptumExplainer.explain.<locals>.custom_txt_fwd')
+             48 MAKE_FUNCTION            8 (closure)
+             50 STORE_FAST               9 (custom_txt_fwd)
+
+ 37          52 SETUP_FINALLY          210 (to 264)
+
+ 39          54 LOAD_DEREF               0 (self)
+             56 LOAD_ATTR                0 (model)
+             58 LOAD_ATTR                2 (text_branch)
+             60 LOAD_ATTR                3 (bert)
+             62 LOAD_ATTR                4 (embeddings)
+             64 LOAD_ATTR                5 (word_embeddings)
+             66 STORE_FAST              10 (target_layer)
+
+ 40          68 LOAD_GLOBAL              6 (LayerIntegratedGradients)
+             70 LOAD_FAST                9 (custom_txt_fwd)
+             72 LOAD_FAST               10 (target_layer)
+             74 CALL_FUNCTION            2
+             76 STORE_FAST              11 (lig_text)
+
+ 42          78 LOAD_FAST               11 (lig_text)
+             80 LOAD_ATTR                7 (attribute)
+
+ 43          82 LOAD_FAST                3 (txt_ids)
+
+ 44          84 LOAD_FAST                1 (tab)
+             86 LOAD_FAST                2 (img)
+             88 LOAD_FAST                4 (txt_mask)
+             90 BUILD_TUPLE              3
+
+ 45          92 LOAD_CONST               5 (15)
+
+ 46          94 LOAD_CONST               6 (1)
+
+ 47          96 LOAD_CONST               7 (True)
+
+ 42          98 LOAD_CONST               8 (('inputs', 'additional_forward_args', 'n_steps', 'internal_batch_size', 'return_convergence_delta'))
+            100 CALL_FUNCTION_KW         5
+            102 UNPACK_SEQUENCE          2
+            104 STORE_FAST              12 (attrs_txt)
+            106 STORE_FAST              13 (_)
+
+ 51         108 LOAD_FAST               12 (attrs_txt)
+            110 LOAD_ATTR                8 (sum)
+            112 LOAD_CONST               9 (-1)
+            114 LOAD_CONST              10 (('dim',))
+            116 CALL_FUNCTION_KW         1
+            118 LOAD_METHOD              9 (squeeze)
+            120 LOAD_CONST              11 (0)
+            122 CALL_METHOD              1
+            124 LOAD_METHOD             10 (cpu)
+            126 CALL_METHOD              0
+            128 LOAD_METHOD             11 (detach)
+            130 CALL_METHOD              0
+            132 LOAD_METHOD             12 (numpy)
+            134 CALL_METHOD              0
+            136 STORE_FAST              12 (attrs_txt)
+
+ 53         138 BUILD_LIST               0
+            140 STORE_FAST              14 (text_result)
+
+ 54         142 LOAD_GLOBAL             13 (enumerate)
+            144 LOAD_FAST                6 (tokens)
+            146 CALL_FUNCTION            1
+            148 GET_ITER
+        >>  150 FOR_ITER                44 (to 196)
+            152 UNPACK_SEQUENCE          2
+            154 STORE_FAST              15 (i)
+            156 STORE_FAST              16 (token)
+
+ 55         158 LOAD_FAST               16 (token)
+            160 LOAD_CONST              12 (('[CLS]', '[SEP]', '[PAD]', ''))
+            162 CONTAINS_OP              1
+            164 POP_JUMP_IF_FALSE      150
+
+ 57         166 LOAD_GLOBAL             14 (float)
+            168 LOAD_FAST               12 (attrs_txt)
+            170 LOAD_FAST               15 (i)
+            172 BINARY_SUBSCR
+            174 CALL_FUNCTION            1
+            176 STORE_FAST              17 (wt)
+
+ 59         178 LOAD_FAST               14 (text_result)
+            180 LOAD_METHOD             15 (append)
+            182 LOAD_FAST               16 (token)
+            184 LOAD_FAST               17 (wt)
+            186 LOAD_CONST              13 (('word', 'weight'))
+            188 BUILD_CONST_KEY_MAP      2
+            190 CALL_METHOD              1
+            192 POP_TOP
+            194 JUMP_ABSOLUTE          150
+
+ 62     >>  196 LOAD_FAST               14 (text_result)
+            198 POP_JUMP_IF_FALSE      252
+
+ 63         200 LOAD_GLOBAL             16 (max)
+            202 LOAD_CONST              14 (<code object <genexpr> at 0x106ec4be0, file "src/explain/captum_explainer.py", line 63>)
+            204 LOAD_CONST              15 ('CaptumExplainer.explain.<locals>.<genexpr>')
+            206 MAKE_FUNCTION            0
+            208 LOAD_FAST               14 (text_result)
+            210 GET_ITER
+            212 CALL_FUNCTION            1
+            214 CALL_FUNCTION            1
+            216 STORE_FAST              18 (max_abs)
+
+ 64         218 LOAD_FAST               18 (max_abs)
+            220 LOAD_CONST              11 (0)
+            222 COMPARE_OP               4 (>)
+            224 POP_JUMP_IF_FALSE      252
+
+ 65         226 LOAD_FAST               14 (text_result)
+            228 GET_ITER
+        >>  230 FOR_ITER                20 (to 252)
+            232 STORE_FAST              19 (x)
+
+ 66         234 LOAD_FAST               19 (x)
+            236 LOAD_CONST              16 ('weight')
+            238 BINARY_SUBSCR
+            240 LOAD_FAST               18 (max_abs)
+            242 BINARY_TRUE_DIVIDE
+            244 LOAD_FAST               19 (x)
+            246 LOAD_CONST              16 ('weight')
+            248 STORE_SUBSCR
+            250 JUMP_ABSOLUTE          230
+
+ 68     >>  252 LOAD_FAST               14 (text_result)
+            254 LOAD_FAST                8 (out)
+            256 LOAD_CONST              17 ('text_attributions')
+            258 STORE_SUBSCR
+            260 POP_BLOCK
+            262 JUMP_FORWARD            50 (to 314)
+
+ 69     >>  264 DUP_TOP
+            266 LOAD_GLOBAL             17 (Exception)
+            268 EXTENDED_ARG             1
+            270 JUMP_IF_NOT_EXC_MATCH   312
+            272 POP_TOP
+            274 STORE_FAST              20 (e)
+            276 POP_TOP
+            278 SETUP_FINALLY           24 (to 304)
+
+ 70         280 LOAD_GLOBAL             18 (logger)
+            282 LOAD_METHOD             19 (error)
+            284 LOAD_CONST              18 ('Text explainer failed: %s')
+            286 LOAD_FAST               20 (e)
+            288 CALL_METHOD              2
+            290 POP_TOP
+            292 POP_BLOCK
+            294 POP_EXCEPT
+            296 LOAD_CONST               1 (None)
+            298 STORE_FAST              20 (e)
+            300 DELETE_FAST             20 (e)
+            302 JUMP_FORWARD            10 (to 314)
+        >>  304 LOAD_CONST               1 (None)
+            306 STORE_FAST              20 (e)
+            308 DELETE_FAST             20 (e)
+            310 RERAISE
+        >>  312 RERAISE
+
+ 75     >>  314 LOAD_FAST                5 (pil_image)
+            316 LOAD_CONST               1 (None)
+            318 IS_OP                    1
+            320 EXTENDED_ARG             2
+            322 POP_JUMP_IF_FALSE      762
+            324 LOAD_FAST                2 (img)
+            326 LOAD_CONST               1 (None)
+            328 IS_OP                    1
+            330 EXTENDED_ARG             2
+            332 POP_JUMP_IF_FALSE      762
+            334 LOAD_FAST                2 (img)
+            336 LOAD_METHOD              8 (sum)
+            338 CALL_METHOD              0
+            340 LOAD_METHOD             20 (item)
+            342 CALL_METHOD              0
+            344 LOAD_CONST              11 (0)
+            346 COMPARE_OP               3 (!=)
+            348 EXTENDED_ARG             2
+            350 POP_JUMP_IF_FALSE      762
+
+ 76         352 LOAD_CLOSURE             0 (self)
+            354 BUILD_TUPLE              1
+            356 LOAD_CONST              19 (<code object custom_img_fwd at 0x106ec4c90, file "src/explain/captum_explainer.py", line 76>)
+            358 LOAD_CONST              20 ('CaptumExplainer.explain.<locals>.custom_img_fwd')
+            360 MAKE_FUNCTION            8 (closure)
+            362 STORE_FAST              21 (custom_img_fwd)
+
+ 79         364 EXTENDED_ARG             1
+            366 SETUP_FINALLY          344 (to 712)
+
+ 80         368 LOAD_GLOBAL             21 (IntegratedGradients)
+            370 LOAD_FAST               21 (custom_img_fwd)
+            372 CALL_FUNCTION            1
+            374 STORE_FAST              22 (ig_image)
+
+ 82         376 LOAD_FAST               22 (ig_image)
+            378 LOAD_ATTR                7 (attribute)
+
+ 83         380 LOAD_FAST                2 (img)
+
+ 84         382 LOAD_FAST                1 (tab)
+            384 LOAD_FAST                3 (txt_ids)
+            386 LOAD_FAST                4 (txt_mask)
+            388 BUILD_TUPLE              3
+
+ 85         390 LOAD_CONST               5 (15)
+
+ 86         392 LOAD_CONST               6 (1)
+
+ 87         394 LOAD_CONST               7 (True)
+
+ 82         396 LOAD_CONST               8 (('inputs', 'additional_forward_args', 'n_steps', 'internal_batch_size', 'return_convergence_delta'))
+            398 CALL_FUNCTION_KW         5
+            400 UNPACK_SEQUENCE          2
+            402 STORE_FAST              23 (attrs_img)
+            404 STORE_FAST              13 (_)
+
+ 90         406 LOAD_FAST               23 (attrs_img)
+            408 LOAD_METHOD              9 (squeeze)
+            410 LOAD_CONST              11 (0)
+            412 CALL_METHOD              1
+            414 LOAD_METHOD             10 (cpu)
+            416 CALL_METHOD              0
+            418 LOAD_METHOD             11 (detach)
+            420 CALL_METHOD              0
+            422 LOAD_METHOD             12 (numpy)
+            424 CALL_METHOD              0
+            426 STORE_FAST              23 (attrs_img)
+
+ 93         428 LOAD_GLOBAL             22 (np)
+            430 LOAD_ATTR               23 (mean)
+            432 LOAD_FAST               23 (attrs_img)
+            434 LOAD_CONST              11 (0)
+            436 LOAD_CONST              21 (('axis',))
+            438 CALL_FUNCTION_KW         2
+            440 STORE_FAST              24 (heatmap)
+
+ 94         442 LOAD_GLOBAL             22 (np)
+            444 LOAD_METHOD             24 (maximum)
+            446 LOAD_FAST               24 (heatmap)
+            448 LOAD_CONST              11 (0)
+            450 CALL_METHOD              2
+            452 STORE_FAST              24 (heatmap)
+
+ 97         454 LOAD_CONST              11 (0)
+            456 LOAD_CONST              22 (('gaussian_filter',))
+            458 IMPORT_NAME             25 (scipy.ndimage)
+            460 IMPORT_FROM             26 (gaussian_filter)
+            462 STORE_FAST              25 (gaussian_filter)
+            464 POP_TOP
+
+ 98         466 LOAD_FAST               25 (gaussian_filter)
+            468 LOAD_FAST               24 (heatmap)
+            470 LOAD_CONST              23 (4)
+            472 LOAD_CONST              24 (('sigma',))
+            474 CALL_FUNCTION_KW         2
+            476 STORE_FAST              24 (heatmap)
+
+100         478 LOAD_FAST               24 (heatmap)
+            480 LOAD_METHOD             16 (max)
+            482 CALL_METHOD              0
+            484 LOAD_CONST              11 (0)
+            486 COMPARE_OP               4 (>)
+            488 EXTENDED_ARG             1
+            490 POP_JUMP_IF_FALSE      504
+
+101         492 LOAD_FAST               24 (heatmap)
+            494 LOAD_FAST               24 (heatmap)
+            496 LOAD_METHOD             16 (max)
+            498 CALL_METHOD              0
+            500 BINARY_TRUE_DIVIDE
+            502 STORE_FAST              24 (heatmap)
+
+104     >>  504 LOAD_CONST              11 (0)
+            506 LOAD_CONST               1 (None)
+            508 IMPORT_NAME             27 (PIL.Image)
+            510 STORE_FAST              26 (PIL)
+
+105         512 LOAD_FAST                5 (pil_image)
+            514 LOAD_METHOD             28 (resize)
+            516 LOAD_CONST              25 ((224, 224))
+            518 LOAD_FAST               26 (PIL)
+            520 LOAD_ATTR               29 (Image)
+            522 LOAD_ATTR               30 (Resampling)
+            524 LOAD_ATTR               31 (BILINEAR)
+            526 CALL_METHOD              2
+            528 STORE_FAST              27 (orig)
+
+106         530 LOAD_GLOBAL             22 (np)
+            532 LOAD_METHOD             32 (array)
+            534 LOAD_FAST               27 (orig)
+            536 CALL_METHOD              1
+            538 STORE_FAST              28 (orig_np)
+
+108         540 LOAD_GLOBAL             33 (plt)
+            542 LOAD_ATTR               34 (subplots)
+            544 LOAD_CONST              26 ((4, 4))
+            546 LOAD_CONST              27 (('figsize',))
+            548 CALL_FUNCTION_KW         1
+            550 UNPACK_SEQUENCE          2
+            552 STORE_FAST              29 (fig)
+            554 STORE_FAST              30 (ax)
+
+109         556 LOAD_FAST               30 (ax)
+            558 LOAD_METHOD             35 (imshow)
+            560 LOAD_FAST               28 (orig_np)
+            562 CALL_METHOD              1
+            564 POP_TOP
+
+112         566 LOAD_GLOBAL             22 (np)
+            568 LOAD_ATTR               36 (ma)
+            570 LOAD_METHOD             37 (masked_where)
+            572 LOAD_FAST               24 (heatmap)
+            574 LOAD_CONST              28 (0.15)
+            576 COMPARE_OP               0 (<)
+            578 LOAD_FAST               24 (heatmap)
+            580 CALL_METHOD              2
+            582 STORE_FAST              31 (masked_heatmap)
+
+115         584 LOAD_FAST                7 (img_score)
+            586 LOAD_CONST              29 (70)
+            588 COMPARE_OP               4 (>)
+            590 EXTENDED_ARG             2
+            592 POP_JUMP_IF_FALSE      598
+            594 LOAD_CONST              30 (0.6)
+            596 JUMP_FORWARD             2 (to 600)
+        >>  598 LOAD_CONST              31 (0.4)
+        >>  600 STORE_FAST              32 (alpha_val)
+
+116         602 LOAD_FAST               30 (ax)
+            604 LOAD_ATTR               35 (imshow)
+            606 LOAD_FAST               31 (masked_heatmap)
+            608 LOAD_CONST              32 ('jet')
+            610 LOAD_FAST               32 (alpha_val)
+            612 LOAD_CONST              33 (('cmap', 'alpha'))
+            614 CALL_FUNCTION_KW         3
+            616 POP_TOP
+
+118         618 LOAD_FAST               30 (ax)
+            620 LOAD_METHOD             38 (axis)
+            622 LOAD_CONST              34 ('off')
+            624 CALL_METHOD              1
+            626 POP_TOP
+
+120         628 LOAD_GLOBAL             39 (io)
+            630 LOAD_METHOD             40 (BytesIO)
+            632 CALL_METHOD              0
+            634 STORE_FAST              33 (buf)
+
+121         636 LOAD_GLOBAL             33 (plt)
+            638 LOAD_ATTR               41 (savefig)
+            640 LOAD_FAST               33 (buf)
+            642 LOAD_CONST              35 ('png')
+            644 LOAD_CONST              36 ('tight')
+            646 LOAD_CONST              11 (0)
+            648 LOAD_CONST               7 (True)
+            650 LOAD_CONST              37 (('format', 'bbox_inches', 'pad_inches', 'transparent'))
+            652 CALL_FUNCTION_KW         5
+            654 POP_TOP
+
+122         656 LOAD_GLOBAL             33 (plt)
+            658 LOAD_METHOD             42 (close)
+            660 LOAD_FAST               29 (fig)
+            662 CALL_METHOD              1
+            664 POP_TOP
+
+123         666 LOAD_FAST               33 (buf)
+            668 LOAD_METHOD             43 (seek)
+            670 LOAD_CONST              11 (0)
+            672 CALL_METHOD              1
+            674 POP_TOP
+
+124         676 LOAD_GLOBAL             44 (base64)
+            678 LOAD_METHOD             45 (b64encode)
+            680 LOAD_FAST               33 (buf)
+            682 LOAD_METHOD             46 (read)
+            684 CALL_METHOD              0
+            686 CALL_METHOD              1
+            688 LOAD_METHOD             47 (decode)
+            690 LOAD_CONST              38 ('utf-8')
+            692 CALL_METHOD              1
+            694 STORE_FAST              34 (encoded)
+
+125         696 LOAD_CONST              39 ('data:image/png;base64,')
+            698 LOAD_FAST               34 (encoded)
+            700 BINARY_ADD
+            702 LOAD_FAST                8 (out)
+            704 LOAD_CONST              40 ('image_explanation_base64')
+            706 STORE_SUBSCR
+            708 POP_BLOCK
+            710 JUMP_FORWARD            50 (to 762)
+
+127     >>  712 DUP_TOP
+            714 LOAD_GLOBAL             17 (Exception)
+            716 EXTENDED_ARG             2
+            718 JUMP_IF_NOT_EXC_MATCH   760
+            720 POP_TOP
+            722 STORE_FAST              20 (e)
+            724 POP_TOP
+            726 SETUP_FINALLY           24 (to 752)
+
+128         728 LOAD_GLOBAL             18 (logger)
+            730 LOAD_METHOD             19 (error)
+            732 LOAD_CONST              41 ('Image explainer failed: %s')
+            734 LOAD_FAST               20 (e)
+            736 CALL_METHOD              2
+            738 POP_TOP
+            740 POP_BLOCK
+            742 POP_EXCEPT
+            744 LOAD_CONST               1 (None)
+            746 STORE_FAST              20 (e)
+            748 DELETE_FAST             20 (e)
+            750 JUMP_FORWARD            10 (to 762)
+        >>  752 LOAD_CONST               1 (None)
+            754 STORE_FAST              20 (e)
+            756 DELETE_FAST             20 (e)
+            758 RERAISE
+        >>  760 RERAISE
+
+130     >>  762 LOAD_FAST                8 (out)
+            764 RETURN_VALUE
+
+Disassembly of <code object custom_txt_fwd at 0x106ec4b30, file "src/explain/captum_explainer.py", line 34>:
+ 35           0 LOAD_DEREF               0 (self)
+              2 LOAD_ATTR                0 (model)
+              4 LOAD_FAST                1 (tab_)
+              6 LOAD_FAST                2 (img_)
+              8 LOAD_FAST                0 (input_ids_)
+             10 LOAD_FAST                3 (mask_)
+             12 LOAD_CONST               1 (('tabular', 'image', 'input_ids', 'attention_mask'))
+             14 CALL_FUNCTION_KW         4
+             16 LOAD_CONST               2 ('probability')
+             18 BINARY_SUBSCR
+             20 RETURN_VALUE
+
+Disassembly of <code object <genexpr> at 0x106ec4be0, file "src/explain/captum_explainer.py", line 63>:
+ 63           0 LOAD_FAST                0 (.0)
+        >>    2 FOR_ITER                18 (to 22)
+              4 STORE_FAST               1 (x)
+              6 LOAD_GLOBAL              0 (abs)
+              8 LOAD_FAST                1 (x)
+             10 LOAD_CONST               0 ('weight')
+             12 BINARY_SUBSCR
+             14 CALL_FUNCTION            1
+             16 YIELD_VALUE
+             18 POP_TOP
+             20 JUMP_ABSOLUTE            2
+        >>   22 LOAD_CONST               1 (None)
+             24 RETURN_VALUE
+
+Disassembly of <code object custom_img_fwd at 0x106ec4c90, file "src/explain/captum_explainer.py", line 76>:
+ 77           0 LOAD_DEREF               0 (self)
+              2 LOAD_ATTR                0 (model)
+              4 LOAD_FAST                1 (tab_)
+              6 LOAD_FAST                0 (img_)
+              8 LOAD_FAST                2 (txt_ids_)
+             10 LOAD_FAST                3 (mask_)
+             12 LOAD_CONST               1 (('tabular', 'image', 'input_ids', 'attention_mask'))
+             14 CALL_FUNCTION_KW         4
+             16 LOAD_CONST               2 ('probability')
+             18 BINARY_SUBSCR
+             20 RETURN_VALUE

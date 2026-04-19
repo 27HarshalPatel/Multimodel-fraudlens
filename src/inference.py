@@ -328,10 +328,11 @@ class FraudLensPredictor:
             explanations = self.explainer.explain(
                 tab_tensor, 
                 img_tensor, 
-                input_ids, 
+                input_ids,
                 attention_mask, 
                 pil_image=image if has_image else None, 
-                tokens=tokens if has_text else None
+                tokens=tokens if has_text else None,
+                img_score=img_score
             )
 
         return {
@@ -460,6 +461,7 @@ class FraudLensPredictor:
                 tab_tensor, img_tensor, input_ids, attention_mask,
                 pil_image=image,
                 tokens=tokens if has_text else None,
+                img_score=img_score
             )
 
         return {

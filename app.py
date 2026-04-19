@@ -444,7 +444,7 @@ def _score_text(text: str) -> tuple[float, list[dict]]:
             hit_count += 1
             text_attrs.append({"word": w, "weight": round(weight, 2)})
         else:
-            text_attrs.append({"word": w, "weight": round(random.uniform(-0.05, 0.15), 2)})
+            text_attrs.append({"word": w, "weight": 0.0})
 
     if hit_count == 0:
         txt_score = 10  # Generic text, no red flags
@@ -456,41 +456,74 @@ def _score_text(text: str) -> tuple[float, list[dict]]:
 def _analyze_image_features(pil_image) -> tuple[float, list[str]]:
     """Analyze image properties for anomaly signals.
 
-    Returns (score, reasons)
+    Returns (score, reasons).
+
+    Design: Documents/receipts are the MOST COMMON legitimate upload.
+    Only penalize for genuine visual anomalies (manipulation artifacts,
+    extreme quality issues), not normal document properties.
     """
     import numpy as np
 
     img_array = np.array(pil_image.convert("RGB"))
     h_img, w_img = img_array.shape[:2]
-    score = 55.0  # Base score for uploaded image
+    score = 15.0  # Low base score — images are innocent until proven guilty
     reasons = []
 
-    # Text-heavy images (receipts, statements) have high edge density
+    # Text-heavy images (receipts, statements) — this is NORMAL for
+    # legitimate documents. Only flag if combined with other anomalies.
     gray = np.mean(img_array, axis=2)
     edge_density = np.mean(np.abs(np.diff(gray, axis=1))) + np.mean(np.abs(np.diff(gray, axis=0)))
-    if edge_density > 15:
+    is_document = edge_density > 10
+
+    # Very low resolution (possible screenshot of screenshot, or heavily compressed)
+    if h_img < 200 or w_img < 200:
         score += 15
-        reasons.append("Document-like image with high text density")
-    if edge_density > 25:
-        score += 10
-        reasons.append("Very text-heavy (bank statement, receipt)")
+        reasons.append("Very low resolution image (possible screenshot or compression artifact)")
 
-    # Dark images or unusual brightness
+    # Extremely dark or washed-out images (possible tampering)
     brightness = np.mean(img_array)
-    if brightness < 80 or brightness > 240:
-        score += 5
-        reasons.append("Unusual image brightness detected")
-
-    # Mobile screenshot aspect ratio
-    aspect = h_img / max(w_img, 1)
-    if aspect > 1.5:
+    if brightness < 50:
         score += 10
-        reasons.append("Phone screenshot aspect ratio (common in fraud evidence)")
+        reasons.append("Very dark image — possible manipulation to hide details")
+    elif brightness > 245:
+        score += 10
+        reasons.append("Overexposed image — possible manipulation to hide details")
+
+    # Check for uniform color blocks (digital editing artifacts)
+    # Real photos have gradient noise; edited areas tend to be perfectly uniform
+    if is_document:
+        # Calculate local variance — very low variance regions suggest digital editing
+        block_size = min(32, h_img // 4, w_img // 4)
+        if block_size >= 8:
+            # Sample patches and check variance
+            patches_checked = 0
+            uniform_patches = 0
+            for y in range(0, h_img - block_size, block_size * 2):
+                for x in range(0, w_img - block_size, block_size * 2):
+                    patch = gray[y:y+block_size, x:x+block_size]
+                    if np.std(patch) < 1.0:  # Nearly perfectly uniform
+                        uniform_patches += 1
+                    patches_checked += 1
+            if patches_checked > 0 and uniform_patches / patches_checked > 0.5:
+                score += 15
+                reasons.append("Large uniform color regions detected (possible digital editing)")
+
+    # Color channel anomaly — check if one channel is significantly different
+    # (common in poorly edited documents)
+    if img_array.ndim == 3 and img_array.shape[2] == 3:
+        channel_means = [np.mean(img_array[:, :, c]) for c in range(3)]
+        channel_spread = max(channel_means) - min(channel_means)
+        if channel_spread > 100:
+            score += 10
+            reasons.append("Unusual color channel distribution (possible filter or editing)")
+
+    if not reasons:
+        reasons.append("Image analysis complete — no visual anomalies detected")
 
     return min(score, 100.0), reasons
 
 
-def _generate_heatmap_b64(pil_image) -> str | None:
+def _generate_heatmap_b64(pil_image, img_score: float = 100.0) -> str | None:
     """Generate edge-based heatmap overlay and return base64 encoded PNG."""
     import numpy as np
     import matplotlib
@@ -511,6 +544,13 @@ def _generate_heatmap_b64(pil_image) -> str | None:
         from scipy.ndimage import gaussian_filter
         heatmap = gaussian_filter(heatmap, sigma=6)
         heatmap = heatmap / (heatmap.max() + 1e-8)
+
+        # Scale intensity so low-risk images don't look "red hot"
+        intensity = max(0.0, min(1.0, (img_score - 15.0) / 85.0)) # 15 is base score
+        if intensity < 0.1:
+             return None # Don't return a heatmap if there are no visual anomalies
+             
+        heatmap = heatmap * intensity
 
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.imshow(orig_np)
@@ -609,7 +649,7 @@ async def analyze_image(
         risk_level = "LOW"
 
     # Heatmap
-    heatmap_b64 = _generate_heatmap_b64(pil_image)
+    heatmap_b64 = _generate_heatmap_b64(pil_image, img_score)
 
     # Risk reasons
     reasons = list(img_reasons)
@@ -856,7 +896,7 @@ async def predict(
             risk_level = "LOW"
 
         # Heatmap
-        heatmap_b64 = _generate_heatmap_b64(pil_image) if pil_image else None
+        heatmap_b64 = _generate_heatmap_b64(pil_image, img_score) if pil_image else None
 
         # Build risk reasons
         reasons = []

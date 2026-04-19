@@ -22,7 +22,7 @@ class CaptumExplainer:
         self.device = device
         self.model.eval()
 
-    def explain(self, tab, img, txt_ids, txt_mask, pil_image=None, tokens=None):
+    def explain(self, tab, img, txt_ids, txt_mask, pil_image=None, tokens=None, img_score=100.0):
         """Run attributions for text tokens and image pixels."""
         out = {"text_attributions": [], "image_explanation_base64": None}
         self.model.zero_grad()
@@ -93,6 +93,10 @@ class CaptumExplainer:
                 heatmap = np.mean(attrs_img, axis=0)
                 heatmap = np.maximum(heatmap, 0) # Only positive contributions
                 
+                # Apply Gaussian filter to smooth the noisy Integrated Gradients
+                from scipy.ndimage import gaussian_filter
+                heatmap = gaussian_filter(heatmap, sigma=4)
+                
                 if heatmap.max() > 0:
                     heatmap = heatmap / heatmap.max()
                 
@@ -103,7 +107,14 @@ class CaptumExplainer:
                 
                 fig, ax = plt.subplots(figsize=(4, 4))
                 ax.imshow(orig_np)
-                ax.imshow(heatmap, cmap='jet', alpha=0.5)
+                
+                # Mask out low values so they are completely transparent
+                masked_heatmap = np.ma.masked_where(heatmap < 0.15, heatmap)
+                
+                # Adjust opacity based on severity
+                alpha_val = 0.6 if img_score > 70 else 0.4
+                ax.imshow(masked_heatmap, cmap='jet', alpha=alpha_val)
+                
                 ax.axis('off')
                 
                 buf = io.BytesIO()
@@ -114,6 +125,7 @@ class CaptumExplainer:
                 out["image_explanation_base64"] = "data:image/png;base64," + encoded
                 
             except Exception as e:
-                logger.error("Image explainer failed: %s", e)
+                import traceback
+                logger.error("Image explainer failed: %s\n%s", e, traceback.format_exc())
 
         return out
