@@ -16,17 +16,11 @@
 
 ---
 
-### 🎬 20-Second Launch Video
-
-[![FraudLens launch video: click to play](FraudLens-Launch-poster.jpg)](FraudLens-Launch-video.mp4)
-
-*Click to play. A statement claims $6,120.50 in withdrawals; the transactions add up to $200. FraudLens catches it.*
-
 ### 📺 Watch FraudLens in Action
 
-![FraudLens Demo](demo.gif)
+[![FraudLens Demo](demo.gif)](FraudLens-Launch-video.mp4)
 
-*Analyzing tabular features, images, and text in real-time with explainable AI!*
+*A statement claims $6,120.50 in withdrawals; the transactions add up to $200. FraudLens catches it. Click for the version with sound.*
 
 </div>
 
