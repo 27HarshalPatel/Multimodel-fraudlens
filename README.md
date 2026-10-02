@@ -16,6 +16,12 @@
 
 ---
 
+### 🎬 20-Second Launch Video
+
+[![FraudLens launch video: click to play](FraudLens-Launch-poster.jpg)](FraudLens-Launch-video.mp4)
+
+*Click to play. A statement claims $6,120.50 in withdrawals; the transactions add up to $200. FraudLens catches it.*
+
 ### 📺 Watch FraudLens in Action
 
 ![FraudLens Demo](demo.gif)
